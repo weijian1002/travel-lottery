@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>旅游地点抽签 - 广州出发5天自驾游</title>
+    <title>旅游地点抽签 - 智能旅游攻略助手</title>
     <style>
         * {
             margin: 0;
@@ -247,7 +247,7 @@
 <body>
     <div class="container">
         <h1>🎲 旅游地点抽签</h1>
-        <p class="subtitle">广州出发 · 5天自驾游 · 说走就走的旅行</p>
+        <p class="subtitle">智能旅游攻略助手 · 自驾/公共交通 · 说走就走的旅行</p>
 
         <div class="lottery-section" id="lotterySection">
             <!-- 旅行设置面板 -->
@@ -256,16 +256,13 @@
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
                     <div>
                         <label style="display: block; margin-bottom: 5px; font-weight: bold;">📍 出发城市</label>
-                        <select id="startCity" style="width: 100%; padding: 10px; font-size: 14px; border: none; border-radius: 5px; outline: none;">
-                            <option value="广州">广州</option>
-                            <option value="深圳">深圳</option>
-                            <option value="佛山">佛山</option>
-                            <option value="东莞">东莞</option>
-                            <option value="珠海">珠海</option>
-                            <option value="中山">中山</option>
-                            <option value="惠州">惠州</option>
-                            <option value="江门">江门</option>
-                        </select>
+                        <input list="cityList" id="startCity" placeholder="输入或选择城市"
+                            style="width: 100%; padding: 10px; font-size: 14px; border: none; border-radius: 5px; outline: none;" value="广州">
+                        <datalist id="cityList">
+                            <option value="广州">
+                            <option value="深圳">
+                            <option value="北京">
+                        </datalist>
                     </div>
                     <div>
                         <label style="display: block; margin-bottom: 5px; font-weight: bold;">📅 出发日期</label>
@@ -273,12 +270,35 @@
                     </div>
                     <div>
                         <label style="display: block; margin-bottom: 5px; font-weight: bold;">🕐 旅行天数</label>
-                        <select id="tripDays" style="width: 100%; padding: 10px; font-size: 14px; border: none; border-radius: 5px; outline: none;">
-                            <option value="3">3天2晚</option>
-                            <option value="4">4天3晚</option>
-                            <option value="5" selected>5天4晚</option>
-                            <option value="6">6天5晚</option>
-                            <option value="7">7天6晚</option>
+                        <input list="daysList" id="tripDays" placeholder="输入或选择天数" type="number" min="1" max="30"
+                            style="width: 100%; padding: 10px; font-size: 14px; border: none; border-radius: 5px; outline: none;" value="5">
+                        <datalist id="daysList">
+                            <option value="3">
+                            <option value="5">
+                            <option value="7">
+                            <option value="10">
+                            <option value="15">
+                            <option value="30">
+                        </datalist>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px;">
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">🚗 出行方式</label>
+                        <select id="travelMode" onchange="toggleTransportOptions()" style="width: 100%; padding: 10px; font-size: 14px; border: none; border-radius: 5px; outline: none;">
+                            <option value="self-driving">自驾</option>
+                            <option value="public-transport">公共交通</option>
+                        </select>
+                    </div>
+                    <div id="transportTypeDiv" style="display: none;">
+                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">✈️ 交通方式</label>
+                        <select id="transportType" style="width: 100%; padding: 10px; font-size: 14px; border: none; border-radius: 5px; outline: none;">
+                            <option value="auto">智能推荐</option>
+                            <option value="flight">飞机</option>
+                            <option value="high-speed-rail">高铁</option>
+                            <option value="train">火车</option>
+                            <option value="bus">长途汽车</option>
+                            <option value="combined">组合交通</option>
                         </select>
                     </div>
                 </div>
@@ -2473,11 +2493,26 @@
         }
 
         // 获取用户设置
+        // 切换交通方式选项显示
+        function toggleTransportOptions() {
+            const travelMode = document.getElementById('travelMode').value;
+            const transportTypeDiv = document.getElementById('transportTypeDiv');
+
+            if (travelMode === 'public-transport') {
+                transportTypeDiv.style.display = 'block';
+            } else {
+                transportTypeDiv.style.display = 'none';
+            }
+        }
+
         function getUserSettings() {
+            const tripDays = document.getElementById('tripDays').value;
             return {
-                startCity: document.getElementById('startCity').value,
+                startCity: document.getElementById('startCity').value.trim() || '广州',
                 startDate: document.getElementById('startDate').value,
-                tripDays: parseInt(document.getElementById('tripDays').value)
+                tripDays: parseInt(tripDays) || 5,
+                travelMode: document.getElementById('travelMode').value,
+                transportType: document.getElementById('transportType').value
             };
         }
 
@@ -2491,6 +2526,132 @@
             const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
             const weekday = weekdays[date.getDay()];
             return `${year}年${month}月${day}日（星期${weekday}）`;
+        }
+
+        // 智能推荐交通方式
+        function recommendTransport(distance, tripDays) {
+            // 根据距离和时间推荐最佳交通方式
+            if (distance < 300) {
+                return {
+                    type: 'self-driving',
+                    name: '自驾',
+                    reason: '距离较近，自驾游更自由便捷',
+                    estimatedTime: Math.ceil(distance / 80) + '小时'
+                };
+            } else if (distance < 800) {
+                return {
+                    type: 'high-speed-rail',
+                    name: '高铁',
+                    reason: '中等距离，高铁快速舒适',
+                    estimatedTime: Math.ceil(distance / 250) + '小时'
+                };
+            } else if (distance < 1500) {
+                if (tripDays >= 5) {
+                    return {
+                        type: 'combined',
+                        name: '高铁+当地租车',
+                        reason: '长距离出行，高铁前往+当地租车自驾',
+                        estimatedTime: Math.ceil(distance / 250) + '小时（高铁）'
+                    };
+                } else {
+                    return {
+                        type: 'flight',
+                        name: '飞机',
+                        reason: '距离较远且时间紧张，飞机最节省时间',
+                        estimatedTime: Math.ceil(distance / 800) + '小时'
+                    };
+                }
+            } else {
+                return {
+                    type: 'flight',
+                    name: '飞机',
+                    reason: '距离遥远，飞机是最佳选择',
+                    estimatedTime: Math.ceil(distance / 800) + '小时'
+                };
+            }
+        }
+
+        // 获取交通方案详情
+        function getTransportPlan(startCity, destCity, settings) {
+            const province = selectedProvince;
+            const provinceData = travelData[province];
+            const distance = provinceData ? provinceData.distance : 800;
+
+            let transport = {};
+
+            if (settings.travelMode === 'self-driving') {
+                transport = {
+                    mode: '自驾',
+                    type: 'self-driving',
+                    details: `从${startCity}自驾前往${destCity}`,
+                    distance: distance + '公里',
+                    estimatedTime: Math.ceil(distance / 80) + '小时',
+                    cost: `油费约${Math.ceil(distance * 0.6)}元，过路费约${Math.ceil(distance * 0.5)}元`,
+                    tips: '建议提前规划路线，注意行车安全，长途驾驶注意休息'
+                };
+            } else {
+                // 公共交通
+                let recommended;
+                if (settings.transportType === 'auto') {
+                    recommended = recommendTransport(distance, settings.tripDays);
+                    transport.type = recommended.type;
+                    transport.mode = recommended.name;
+                    transport.recommendReason = recommended.reason;
+                } else {
+                    const typeMap = {
+                        'flight': '飞机',
+                        'high-speed-rail': '高铁',
+                        'train': '火车',
+                        'bus': '长途汽车',
+                        'combined': '组合交通'
+                    };
+                    transport.type = settings.transportType;
+                    transport.mode = typeMap[settings.transportType] || '公共交通';
+                }
+
+                // 根据交通方式设置详情
+                switch (transport.type) {
+                    case 'flight':
+                        transport.details = `${startCity} → ${destCity}（直飞或中转）`;
+                        transport.estimatedTime = Math.ceil(distance / 800) + '小时';
+                        transport.cost = `机票价格${Math.ceil(distance * 0.8)}-${Math.ceil(distance * 1.5)}元（淡旺季浮动）`;
+                        transport.tips = '建议提前购票享优惠，注意航班时刻表，提前2小时到达机场';
+                        break;
+                    case 'high-speed-rail':
+                        transport.details = `${startCity}站 → ${destCity}站（高铁）`;
+                        transport.estimatedTime = Math.ceil(distance / 250) + '小时';
+                        transport.cost = `二等座约${Math.ceil(distance * 0.5)}元，一等座约${Math.ceil(distance * 0.8)}元`;
+                        transport.tips = '提前12306购票，高峰期建议提前购买，提前30分钟到站';
+                        break;
+                    case 'train':
+                        transport.details = `${startCity}站 → ${destCity}站（普通火车）`;
+                        transport.estimatedTime = Math.ceil(distance / 100) + '小时';
+                        transport.cost = `硬座约${Math.ceil(distance * 0.2)}元，硬卧约${Math.ceil(distance * 0.35)}元`;
+                        transport.tips = '经济实惠，适合预算有限的旅行，车程较长注意休息';
+                        break;
+                    case 'bus':
+                        transport.details = `${startCity}汽车站 → ${destCity}汽车站`;
+                        transport.estimatedTime = Math.ceil(distance / 70) + '小时';
+                        transport.cost = `约${Math.ceil(distance * 0.4)}元`;
+                        transport.tips = '提前在网上或车站购票，长途车注意选择正规客运公司';
+                        break;
+                    case 'combined':
+                        transport.details = `高铁前往+当地租车自驾游`;
+                        transport.estimatedTime = Math.ceil(distance / 250) + '小时（高铁）';
+                        transport.cost = `高铁${Math.ceil(distance * 0.5)}元 + 租车${settings.tripDays * 200}元/天`;
+                        transport.tips = '灵活便捷，兼顾速度和自由度，提前预订租车可享优惠';
+                        break;
+                    default:
+                        transport.details = `从${startCity}前往${destCity}`;
+                        transport.estimatedTime = '待查询';
+                        transport.cost = '根据实际情况而定';
+                        transport.tips = '建议根据实际情况选择合适的交通工具';
+                }
+
+                transport.distance = distance + '公里';
+            }
+
+            return transport;
         }
 
         function startDraw() {
@@ -2587,6 +2748,9 @@
 
             let html = '';
 
+            // 获取交通方案
+            const transport = getTransportPlan(settings.startCity, selectedCity, settings);
+
             // 用户设置信息
             html += `
                 <div class="guide-item" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;">
@@ -2598,23 +2762,31 @@
                         </div>
                         <div style="background: rgba(255,255,255,0.2); padding: 15px; border-radius: 8px;">
                             <div style="font-size: 14px; opacity: 0.9; margin-bottom: 5px;">📅 出发日期</div>
-                            <div style="font-size: 18px; font-weight: bold;">${formatDate(settings.startDate)}</div>
+                            <div style="font-size: 18px; font-weight: bold;">${formatDate(settings.startDate) || '待定'}</div>
                         </div>
                         <div style="background: rgba(255,255,255,0.2); padding: 15px; border-radius: 8px;">
                             <div style="font-size: 14px; opacity: 0.9; margin-bottom: 5px;">🕐 旅行天数</div>
                             <div style="font-size: 18px; font-weight: bold;">${settings.tripDays}天${settings.tripDays-1}晚</div>
                         </div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 15px; border-radius: 8px;">
+                            <div style="font-size: 14px; opacity: 0.9; margin-bottom: 5px;">${settings.travelMode === 'self-driving' ? '🚗' : '✈️'} 出行方式</div>
+                            <div style="font-size: 18px; font-weight: bold;">${transport.mode}</div>
+                        </div>
                     </div>
                 </div>
             `;
 
-            // 基本信息（修改路线起点）
-            const modifiedRoute = guide.route.replace(/^广州/, settings.startCity);
+            // 交通方案
             html += `
                 <div class="guide-item">
-                    <h3>🚗 自驾路线</h3>
-                    <p><strong>路线：</strong>${modifiedRoute}</p>
-                    <p><strong>沿途风景：</strong>${guide.scenery}</p>
+                    <h3>${settings.travelMode === 'self-driving' ? '🚗' : '✈️'} 交通方案</h3>
+                    ${transport.recommendReason ? `<p style="background: #fff3cd; padding: 10px; border-radius: 5px; margin-bottom: 15px;"><strong>💡 智能推荐：</strong>${transport.recommendReason}</p>` : ''}
+                    <p><strong>方式：</strong>${transport.mode}</p>
+                    <p><strong>路线：</strong>${transport.details}</p>
+                    <p><strong>距离：</strong>${transport.distance}</p>
+                    <p><strong>预计时间：</strong>${transport.estimatedTime}</p>
+                    <p><strong>费用预估：</strong>${transport.cost}</p>
+                    <p><strong>💡 出行建议：</strong>${transport.tips}</p>
                 </div>
             `;
 
@@ -2841,22 +3013,41 @@
                 return;
             }
 
+            // 获取交通方案
+            const transport = getTransportPlan(settings.startCity, city, settings);
+
             // 构建文本内容
             let content = `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-            content += `      ${city} ${settings.tripDays}天${settings.tripDays-1}晚自驾游详细攻略\n`;
+            content += `      ${city} ${settings.tripDays}天${settings.tripDays-1}晚旅游详细攻略\n`;
             content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
             content += `✨ 您的旅行计划\n`;
             content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
             content += `📍 出发城市：${settings.startCity}\n`;
-            content += `📅 出发日期：${formatDate(settings.startDate)}\n`;
-            content += `🕐 旅行天数：${settings.tripDays}天${settings.tripDays-1}晚\n\n`;
+            content += `📅 出发日期：${formatDate(settings.startDate) || '待定'}\n`;
+            content += `🕐 旅行天数：${settings.tripDays}天${settings.tripDays-1}晚\n`;
+            content += `${settings.travelMode === 'self-driving' ? '🚗' : '✈️'} 出行方式：${transport.mode}\n\n`;
+
+            content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+            content += `${settings.travelMode === 'self-driving' ? '🚗' : '✈️'} 交通方案\n`;
+            content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+            if (transport.recommendReason) {
+                content += `💡 智能推荐：${transport.recommendReason}\n\n`;
+            }
+            content += `交通方式：${transport.mode}\n`;
+            content += `路线详情：${transport.details}\n`;
+            content += `距离：${transport.distance}\n`;
+            content += `预计时间：${transport.estimatedTime}\n`;
+            content += `费用预估：${transport.cost}\n`;
+            content += `💡 出行建议：${transport.tips}\n\n`;
+
             content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
             content += `目的地信息\n`;
             content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
             content += `📍 目的地：${province} - ${city}\n`;
-            const modifiedRoute = guide.route.replace(/^广州/, settings.startCity);
-            content += `🚗 自驾路线：${modifiedRoute}\n`;
-            content += `🌄 沿途风景：${guide.scenery}\n\n`;
+            if (guide.scenery) {
+                content += `🌄 风景特色：${guide.scenery}\n`;
+            }
+            content += `\n`;
 
             // 详细行程
             if (guide.itinerary) {
