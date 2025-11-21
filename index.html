@@ -2692,8 +2692,14 @@
         function downloadGuide() {
             const city = selectedCity;
             const province = selectedProvince;
-            const guide = travelData[province][city];
+            const guide = travelGuides[city];
             const settings = getUserSettings();
+
+            // 错误检查
+            if (!guide) {
+                alert('❌ 攻略数据不存在，请重新选择城市');
+                return;
+            }
 
             // 构建文本内容
             let content = `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
@@ -2867,8 +2873,8 @@
             let foundProvince = null;
             let foundCity = null;
 
-            for (const [province, cities] of Object.entries(travelData)) {
-                if (cities[cityName]) {
+            for (const [province, data] of Object.entries(travelData)) {
+                if (data.cities && data.cities.includes(cityName)) {
                     foundProvince = province;
                     foundCity = cityName;
                     break;
@@ -2876,6 +2882,12 @@
             }
 
             if (foundCity) {
+                // 检查是否有该城市的攻略数据
+                if (!travelGuides[foundCity]) {
+                    searchHint.innerHTML = `<span style="color: #f5576c;">❌ "${foundCity}"暂无详细攻略</span>`;
+                    return;
+                }
+
                 // 找到城市，显示攻略
                 selectedProvince = foundProvince;
                 selectedCity = foundCity;
@@ -2892,9 +2904,9 @@
 
                 // 显示可用城市列表
                 const allCities = [];
-                for (const [province, cities] of Object.entries(travelData)) {
-                    for (const city of Object.keys(cities)) {
-                        allCities.push(city);
+                for (const [province, data] of Object.entries(travelData)) {
+                    if (data.cities) {
+                        allCities.push(...data.cities);
                     }
                 }
 
