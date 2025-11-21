@@ -256,7 +256,7 @@
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
                     <div>
                         <label style="display: block; margin-bottom: 5px; font-weight: bold;">📍 出发城市</label>
-                        <input list="cityList" id="startCity" placeholder="输入或选择城市"
+                        <input list="cityList" id="startCity" placeholder="输入或选择城市" onchange="updateSubtitle()"
                             style="width: 100%; padding: 10px; font-size: 14px; border: none; border-radius: 5px; outline: none;" value="广州">
                         <datalist id="cityList">
                             <option value="广州">
@@ -270,7 +270,7 @@
                     </div>
                     <div>
                         <label style="display: block; margin-bottom: 5px; font-weight: bold;">🕐 旅行天数</label>
-                        <input list="daysList" id="tripDays" placeholder="输入或选择天数" type="number" min="1" max="30"
+                        <input list="daysList" id="tripDays" placeholder="输入或选择天数" type="number" min="1" max="30" onchange="updateSubtitle()"
                             style="width: 100%; padding: 10px; font-size: 14px; border: none; border-radius: 5px; outline: none;" value="5">
                         <datalist id="daysList">
                             <option value="3">
@@ -2486,13 +2486,12 @@
 
         // 更新副标题
         function updateSubtitle() {
-            const startCity = document.getElementById('startCity').value;
-            const tripDays = document.getElementById('tripDays').value;
+            const settings = getUserSettings();
             const subtitle = document.querySelector('.subtitle');
-            subtitle.textContent = `${startCity}出发 · ${tripDays}天${parseInt(tripDays)-1}晚自驾游 · 说走就走的旅行`;
+            const travelModeText = settings.travelMode === 'self-driving' ? '自驾游' : '公共交通';
+            subtitle.textContent = `${settings.startCity}出发 · ${settings.tripDays}天${settings.tripDays-1}晚${travelModeText} · 说走就走的旅行`;
         }
 
-        // 获取用户设置
         // 切换交通方式选项显示
         function toggleTransportOptions() {
             const travelMode = document.getElementById('travelMode').value;
@@ -2503,7 +2502,10 @@
             } else {
                 transportTypeDiv.style.display = 'none';
             }
+            updateSubtitle(); // 更新副标题
         }
+
+        // 获取用户设置
 
         function getUserSettings() {
             const tripDays = document.getElementById('tripDays').value;
@@ -2654,6 +2656,61 @@
             return transport;
         }
 
+        // 生成通用攻略模板（用于没有详细攻略的城市）
+        function generateGenericGuide(city, province) {
+            const provinceData = travelData[province];
+            const distance = provinceData ? provinceData.distance : 800;
+
+            return {
+                route: `从出发城市经高速公路前往${city}（约${distance}公里）`,
+                scenery: `沿途可欣赏${province.replace('省', '').replace('市', '')}地区的自然风光和人文景观`,
+                attractions: [
+                    '当地著名景点（建议提前查询）',
+                    '历史文化遗迹',
+                    '自然风光名胜',
+                    '特色街区或商业区'
+                ],
+                food: [
+                    '当地特色美食',
+                    '传统小吃',
+                    '特色餐厅'
+                ],
+                budget: {
+                    transport: {
+                        fuel: Math.ceil(distance * 0.6),
+                        toll: Math.ceil(distance * 0.5),
+                        total: Math.ceil(distance * 1.1)
+                    },
+                    accommodation: {
+                        hotel: '经济型酒店200-400元/晚，星级酒店500-1000元/晚',
+                        nights: 4,
+                        total: '1200-4000'
+                    },
+                    food: {
+                        breakfast: '人均30-50元',
+                        lunch: '人均50-100元',
+                        dinner: '人均80-150元',
+                        total: '1600-3000'
+                    },
+                    tickets: {
+                        attractions: '根据实际景点而定，约500-1500',
+                        total: '500-1500'
+                    },
+                    total: '约4000-10000元（2人）'
+                },
+                tips: [
+                    { title: '出行准备', content: '提前规划路线，预订住宿，查看天气预报' },
+                    { title: '旅游资讯', content: '建议访问马蜂窝、携程、去哪儿等旅游网站查看详细攻略和游记' },
+                    { title: '当地特色', content: '到达后可向当地人咨询推荐景点和美食' },
+                    { title: '安全提示', content: '注意人身和财产安全，保管好重要物品' }
+                ],
+                bestTime: '春秋两季通常是最佳旅游季节，具体请查询当地气候特点',
+                weather: '出发前请查看天气预报，准备合适衣物',
+                specialNotes: `由于${city}的详细攻略数据暂未收录，以上为通用参考信息。建议您：\n1. 访问马蜂窝(mafengwo.cn)、携程(ctrip.com)查看${city}的详细攻略\n2. 搜索"${city}旅游攻略"获取最新游记和推荐\n3. 加入${city}旅游相关的社交媒体群组获取实时信息`,
+                isGeneric: true // 标记为通用攻略
+            };
+        }
+
         function startDraw() {
             if (isDrawing) return;
 
@@ -2742,11 +2799,35 @@
 
             document.getElementById('finalDestination').textContent = `${selectedProvince} · ${selectedCity}`;
 
-            const guide = travelGuides[selectedCity];
+            // 如果没有详细攻略，使用通用模板
+            let guide = travelGuides[selectedCity];
+            const isGenericGuide = !guide;
+            if (!guide) {
+                guide = generateGenericGuide(selectedCity, selectedProvince);
+            }
+
             const guideContent = document.getElementById('guideContent');
             const settings = getUserSettings();
 
             let html = '';
+
+            // 如果是通用攻略，添加提示
+            if (isGenericGuide) {
+                html += `
+                    <div style="background: #fff3cd; border: 2px solid #ffc107; border-radius: 10px; padding: 20px; margin-bottom: 20px;">
+                        <h3 style="color: #856404; margin-bottom: 10px;">📢 温馨提示</h3>
+                        <p style="color: #856404; line-height: 1.6; margin-bottom: 10px;">
+                            <strong>${selectedCity}</strong> 的详细攻略数据暂未收录，以下为系统生成的通用参考攻略。
+                        </p>
+                        <p style="color: #856404; line-height: 1.6;">
+                            💡 <strong>建议您访问以下网站获取更详细的旅游信息：</strong><br>
+                            • <a href="https://www.mafengwo.cn/search/q.php?q=${encodeURIComponent(selectedCity)}旅游" target="_blank" style="color: #667eea;">马蜂窝</a> - 查看游记和攻略<br>
+                            • <a href="https://you.ctrip.com/search?query=${encodeURIComponent(selectedCity)}" target="_blank" style="color: #667eea;">携程旅游</a> - 预订门票和酒店<br>
+                            • <a href="https://www.qunar.com/search?searchWord=${encodeURIComponent(selectedCity)}旅游" target="_blank" style="color: #667eea;">去哪儿</a> - 查看旅游产品
+                        </p>
+                    </div>
+                `;
+            }
 
             // 获取交通方案
             const transport = getTransportPlan(settings.startCity, selectedCity, settings);
@@ -3004,13 +3085,13 @@
         function downloadGuide() {
             const city = selectedCity;
             const province = selectedProvince;
-            const guide = travelGuides[city];
+            let guide = travelGuides[city];
             const settings = getUserSettings();
 
-            // 错误检查
+            // 如果没有详细攻略，使用通用模板
+            const isGenericGuide = !guide;
             if (!guide) {
-                alert('❌ 攻略数据不存在，请重新选择城市');
-                return;
+                guide = generateGenericGuide(city, province);
             }
 
             // 获取交通方案
@@ -3020,6 +3101,18 @@
             let content = `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
             content += `      ${city} ${settings.tripDays}天${settings.tripDays-1}晚旅游详细攻略\n`;
             content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+
+            // 如果是通用攻略，添加提示
+            if (isGenericGuide) {
+                content += `📢 温馨提示\n`;
+                content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+                content += `${city} 的详细攻略数据暂未收录，以下为系统生成的通用参考攻略。\n\n`;
+                content += `💡 建议您访问以下网站获取更详细的旅游信息：\n`;
+                content += `• 马蜂窝：www.mafengwo.cn - 查看游记和攻略\n`;
+                content += `• 携程旅游：you.ctrip.com - 预订门票和酒店\n`;
+                content += `• 去哪儿：www.qunar.com - 查看旅游产品\n\n`;
+            }
+
             content += `✨ 您的旅行计划\n`;
             content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
             content += `📍 出发城市：${settings.startCity}\n`;
