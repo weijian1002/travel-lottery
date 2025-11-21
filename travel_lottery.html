@@ -1,0 +1,2914 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>旅游地点抽签 - 广州出发5天自驾游</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            text-align: center;
+            color: rgba(255,255,255,0.9);
+            font-size: 1.1em;
+            margin-bottom: 30px;
+        }
+
+        .lottery-section {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            gap: 20px;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e0e0e0;
+            color: #666;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .step-number.active {
+            background: #667eea;
+            color: white;
+            transform: scale(1.2);
+        }
+
+        .step-number.completed {
+            background: #4caf50;
+            color: white;
+        }
+
+        .step-text {
+            color: #666;
+            font-weight: bold;
+        }
+
+        .lottery-box {
+            text-align: center;
+            padding: 40px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .lottery-display {
+            font-size: 3em;
+            font-weight: bold;
+            color: #667eea;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px 0;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes spin {
+            0% { transform: rotateY(0deg); }
+            100% { transform: rotateY(360deg); }
+        }
+
+        .spinning {
+            animation: spin 0.3s linear infinite;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2em;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .result-section {
+            display: none;
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .result-section.show {
+            display: block;
+            animation: slideIn 0.5s;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .result-header h2 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .result-destination {
+            font-size: 1.5em;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .guide-section {
+            margin-top: 20px;
+        }
+
+        .guide-item {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        .guide-item h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .guide-item ul {
+            list-style-position: inside;
+            color: #555;
+            line-height: 1.8;
+        }
+
+        .guide-item p {
+            color: #555;
+            line-height: 1.8;
+            margin-bottom: 10px;
+        }
+
+        .budget-box {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .budget-box h3 {
+            margin-bottom: 10px;
+        }
+
+        .budget-amount {
+            font-size: 2em;
+            font-weight: bold;
+        }
+
+        .restart-btn {
+            display: block;
+            margin: 30px auto 0;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s linear infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎲 旅游地点抽签</h1>
+        <p class="subtitle">广州出发 · 5天自驾游 · 说走就走的旅行</p>
+
+        <div class="lottery-section" id="lotterySection">
+            <!-- 旅行设置面板 -->
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 10px; margin-bottom: 30px; color: white;">
+                <h3 style="margin-bottom: 15px; text-align: center;">⚙️ 旅行设置</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">📍 出发城市</label>
+                        <select id="startCity" style="width: 100%; padding: 10px; font-size: 14px; border: none; border-radius: 5px; outline: none;">
+                            <option value="广州">广州</option>
+                            <option value="深圳">深圳</option>
+                            <option value="佛山">佛山</option>
+                            <option value="东莞">东莞</option>
+                            <option value="珠海">珠海</option>
+                            <option value="中山">中山</option>
+                            <option value="惠州">惠州</option>
+                            <option value="江门">江门</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">📅 出发日期</label>
+                        <input type="date" id="startDate" style="width: 100%; padding: 10px; font-size: 14px; border: none; border-radius: 5px; outline: none;">
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">🕐 旅行天数</label>
+                        <select id="tripDays" style="width: 100%; padding: 10px; font-size: 14px; border: none; border-radius: 5px; outline: none;">
+                            <option value="3">3天2晚</option>
+                            <option value="4">4天3晚</option>
+                            <option value="5" selected>5天4晚</option>
+                            <option value="6">6天5晚</option>
+                            <option value="7">7天6晚</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 15px; font-size: 14px; opacity: 0.9;">
+                    💡 设置好您的旅行偏好，开始抽签或搜索城市
+                </div>
+            </div>
+
+            <div class="step-indicator">
+                <div class="step">
+                    <div class="step-number active" id="step1">1</div>
+                    <span class="step-text">抽取省份</span>
+                </div>
+                <div class="step">
+                    <div class="step-number" id="step2">2</div>
+                    <span class="step-text">抽取城市</span>
+                </div>
+                <div class="step">
+                    <div class="step-number" id="step3">3</div>
+                    <span class="step-text">生成攻略</span>
+                </div>
+            </div>
+
+            <div class="lottery-box">
+                <h2 id="lotteryTitle">第一步：抽取省份</h2>
+                <div class="lottery-display" id="lotteryDisplay">
+                    点击下方按钮开始抽签
+                </div>
+                <button class="btn" id="drawBtn" onclick="startDraw()">开始抽签</button>
+
+                <div style="margin-top: 30px; padding-top: 20px; border-top: 2px dashed #ccc;">
+                    <h3 style="color: #667eea; margin-bottom: 15px;">🔍 或直接搜索城市攻略</h3>
+                    <div style="display: flex; gap: 10px; max-width: 500px; margin: 0 auto;">
+                        <input type="text" id="searchInput" placeholder="输入城市名（如：厦门、桂林）"
+                            style="flex: 1; padding: 12px; font-size: 16px; border: 2px solid #667eea; border-radius: 8px; outline: none;"
+                            onkeypress="if(event.key==='Enter') searchCity()">
+                        <button class="btn" onclick="searchCity()" style="background: #f5576c;">搜索</button>
+                    </div>
+                    <div id="searchHint" style="margin-top: 10px; font-size: 14px; color: #666;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="result-section" id="resultSection">
+            <div class="result-header">
+                <h2>🎉 恭喜！您的旅行目的地是</h2>
+                <div class="result-destination" id="finalDestination"></div>
+            </div>
+
+            <div class="guide-section" id="guideContent"></div>
+
+            <button class="btn restart-btn" onclick="restart()">重新抽签</button>
+        </div>
+    </div>
+
+    <script>
+        // 广州出发5天自驾游可达的省份和城市数据
+        const travelData = {
+            '广东省': {
+                cities: ['深圳', '珠海', '惠州', '清远', '韶关', '梅州', '潮州', '汕头'],
+                distance: 500,
+                driveTime: 6
+            },
+            '广西': {
+                cities: ['桂林', '阳朔', '北海', '南宁', '柳州', '贺州'],
+                distance: 600,
+                driveTime: 7
+            },
+            '福建省': {
+                cities: ['厦门', '福州', '泉州', '漳州', '武夷山'],
+                distance: 750,
+                driveTime: 8
+            },
+            '湖南省': {
+                cities: ['长沙', '张家界', '凤凰古城', '岳阳', '郴州'],
+                distance: 700,
+                driveTime: 8
+            },
+            '江西省': {
+                cities: ['南昌', '景德镇', '庐山', '婺源', '井冈山'],
+                distance: 800,
+                driveTime: 9
+            },
+            '贵州省': {
+                cities: ['贵阳', '黔东南', '荔波', '黄果树', '镇远'],
+                distance: 900,
+                driveTime: 10
+            },
+            '云南省': {
+                cities: ['昆明', '大理', '丽江', '西双版纳', '香格里拉'],
+                distance: 1500,
+                driveTime: 18
+            },
+            '海南省': {
+                cities: ['海口', '三亚', '万宁', '陵水', '文昌'],
+                distance: 500,
+                driveTime: 8
+            }
+        };
+
+        // 详细的旅游攻略数据（参考实际行程格式）
+        const travelGuides = {
+            '深圳': {
+                route: '广州 → 广深高速(G4) → 深圳（约130公里，1.5小时）',
+                scenery: '沿途可欣赏珠三角城市风光，高速两旁绿化景观，途经东莞松山湖',
+
+                // 5天4夜详细行程
+                itinerary: [
+                    {
+                        day: 1,
+                        title: '广州出发 → 深圳市区',
+                        schedule: [
+                            { time: '09:00-11:00', activity: '广州出发，驾车前往深圳', transport: '自驾 G4京港澳高速转广深高速', cost: '油费约80元，过路费约60元', tips: '避开早高峰，建议9点后出发' },
+                            { time: '11:00-13:00', activity: '抵达深圳，办理酒店入住，午餐', location: '福田区/南山区酒店', food: '推荐：翠园餐厅（粤菜）、探鱼（烤鱼）', cost: '午餐约150元/人' },
+                            { time: '14:00-18:00', activity: '世界之窗游玩', location: '世界之窗主题公园', tickets: '门票约200元/人', tips: '可以看到世界各地微缩景观，建议提前网购门票优惠30元' },
+                            { time: '18:30-20:00', activity: '晚餐', location: '欢乐海岸', food: '推荐：南海渔村（海鲜）、椰妹（椰子鸡）', cost: '晚餐约250元/人' },
+                            { time: '20:00-21:30', activity: '欢乐海岸散步、水秀表演', location: '欢乐海岸', tickets: '免费', tips: '每晚有水秀表演，很漂亮' }
+                        ]
+                    },
+                    {
+                        day: 2,
+                        title: '东部海滨一日游',
+                        schedule: [
+                            { time: '08:30-09:30', activity: '酒店早餐后出发', transport: '自驾前往东部', cost: '油费约40元' },
+                            { time: '10:00-12:30', activity: '大梅沙海滨公园', location: '盐田区大梅沙', tickets: '免费（需网上预约）', tips: '提前3天预约，周末人多，可以玩沙滩、游泳' },
+                            { time: '12:30-14:00', activity: '午餐', food: '大梅沙海鲜大排档、椰林海鲜城', cost: '约300元（海鲜）' },
+                            { time: '14:30-18:00', activity: '东部华侨城茶溪谷', location: '盐田区', tickets: '约180元/人', tips: '有茶园、花海、表演，适合拍照' },
+                            { time: '18:30-20:00', activity: '返回市区晚餐', location: '罗湖老街', food: '潮汕牛肉火锅、客家菜', cost: '约200元' },
+                            { time: '20:30-22:00', activity: '东门老街购物', location: '罗湖东门', tips: '深圳老商业区，可以淘货、小吃很多' }
+                        ]
+                    },
+                    {
+                        day: 3,
+                        title: '深圳湾 + 蛇口一日游',
+                        schedule: [
+                            { time: '09:00-11:30', activity: '深圳湾公园骑行', location: '南山区深圳湾公园', tickets: '免费，租自行车约30元/小时', tips: '沿海骑行，可以看到深圳湾大桥和对岸香港' },
+                            { time: '12:00-13:30', activity: '午餐', location: '海岸城/万象城', food: '港式茶餐厅、粤菜', cost: '约150元/人' },
+                            { time: '14:00-17:00', activity: '欢乐谷', location: '南山区欢乐谷', tickets: '约230元/人', tips: '大型游乐场，有过山车等刺激项目，下午入园人少' },
+                            { time: '17:30-19:00', activity: '蛇口海上世界', location: '南山区蛇口', food: '各国美食、酒吧街', cost: '晚餐约200元' },
+                            { time: '19:30-21:00', activity: '海上世界散步，看邮轮', location: '蛇口海上世界', tips: '有明华轮可以参观，夜景很美' }
+                        ]
+                    },
+                    {
+                        day: 4,
+                        title: '莲花山 + 市民中心 + 购物',
+                        schedule: [
+                            { time: '08:30-11:00', activity: '莲花山公园登山', location: '福田区莲花山公园', tickets: '免费', tips: '山顶有邓小平雕像，可以俯瞰深圳市中心CBD' },
+                            { time: '11:30-13:00', activity: '午餐', location: '福田中心区', food: '推荐：海底捞、点都德（早茶）', cost: '约150元/人' },
+                            { time: '13:30-15:30', activity: '参观深圳市民中心、图书馆', location: '福田区市民中心', tickets: '免费', tips: '现代化建筑，适合拍照，图书馆可以休息' },
+                            { time: '16:00-19:00', activity: 'COCO Park购物', location: '福田COCO Park', tips: '深圳知名商圈，各种品牌、美食' },
+                            { time: '19:00-21:00', activity: '晚餐 + 夜景', location: '京基100/平安金融中心', food: '高层餐厅、观景台', cost: '约300元（含观景台）' }
+                        ]
+                    },
+                    {
+                        day: 5,
+                        title: '返程日 - 前海 + 返回广州',
+                        schedule: [
+                            { time: '09:00-10:30', activity: '酒店退房，前往前海', transport: '自驾', cost: '油费约20元' },
+                            { time: '10:30-12:00', activity: '前海石公园', location: '南山区前海', tickets: '免费', tips: '深圳新地标，可以看到前海自贸区全景' },
+                            { time: '12:00-13:30', activity: '午餐', location: '前海/宝安', food: '深圳特色美食', cost: '约150元/人' },
+                            { time: '14:00-16:00', activity: '返回广州', transport: '广深高速', cost: '油费约80元，过路费约60元', tips: '避开晚高峰，建议下午出发' },
+                            { time: '16:00', activity: '抵达广州，旅程结束', tips: '途中可在服务区休息' }
+                        ]
+                    }
+                ],
+
+                attractions: [
+                    { name: '世界之窗', intro: '世界各地著名景观微缩版，适合拍照打卡', time: '建议游玩4小时', tickets: '200元（网购170元）', tips: '周末人多，建议工作日去' },
+                    { name: '欢乐谷', intro: '大型主题乐园，有各种刺激项目', time: '建议游玩半天', tickets: '230元', tips: '下午入园人少，可以玩快速通道' },
+                    { name: '大梅沙海滨公园', intro: '免费沙滩，可以游泳玩沙', time: '建议游玩3小时', tickets: '免费（需预约）', tips: '夏季最佳，记得带泳衣' },
+                    { name: '东部华侨城', intro: '茶溪谷+大侠谷，有茶园、瀑布、游乐设施', time: '建议游玩5小时', tickets: '180-200元', tips: '建议只去茶溪谷，风景更好' },
+                    { name: '深圳湾公园', intro: '沿海公园，可以骑行、散步，看香港', time: '建议游玩2小时', tickets: '免费', tips: '租自行车30元/小时，傍晚最美' },
+                    { name: '莲花山公园', intro: '可以俯瞰深圳CBD，有邓小平雕像', time: '建议游玩2小时', tickets: '免费', tips: '早上去人少，空气好' }
+                ],
+
+                food: [
+                    { name: '潮汕牛肉火锅', location: '八合里、海记', price: '人均100-150元', tips: '新鲜牛肉现切，沙茶酱很正宗', recommend: '吊龙、五花趾、牛肉丸' },
+                    { name: '客家菜', location: '客家王、外婆家', price: '人均80-120元', recommend: '盐焗鸡、酿豆腐、梅菜扣肉' },
+                    { name: '海鲜大排档', location: '南澳、大梅沙', price: '人均150-300元', tips: '选择新鲜的，价格可以讲价', recommend: '濑尿虾、花蟹、扇贝' },
+                    { name: '港式茶餐厅', location: '翠园、点都德', price: '人均60-100元', recommend: '虾饺、叉烧包、肠粉、流沙包' },
+                    { name: '椰子鸡', location: '椰妹、润园四季', price: '人均80-120元', tips: '清甜养生，适合夏天', recommend: '椰子鸡、椰子冻、竹笙' }
+                ],
+
+                budget: {
+                    transport: { fuel: 200, toll: 120, parking: 150, total: 470 },
+                    accommodation: { hotel: '250-300元/晚', nights: 4, total: 1200 },
+                    food: { breakfast: 30, lunch: 150, dinner: 200, total: 1900 },
+                    tickets: { attractions: 600, others: 200, total: 800 },
+                    shopping: 500,
+                    total: 4870,
+                    notes: '以上为2人预算，人均约2435元'
+                },
+
+                tips: [
+                    { title: '交通', content: '深圳停车较贵，市区15-30元/小时，建议停在酒店，乘地铁出行' },
+                    { title: '住宿', content: '建议住福田/南山区，交通方便，酒店选择多' },
+                    { title: '最佳时间', content: '10-12月、3-5月最佳，避开暑期和春节' },
+                    { title: '预约', content: '大梅沙需提前预约，微信搜"深圳大梅沙"预约' },
+                    { title: '美食街', content: '东门老街、华强北、车公庙美食街、蛇口酒吧街' },
+                    { title: '停车', content: '景点停车：世界之窗20元/次，欢乐谷30元/次，商场一般消费免费停车' }
+                ],
+
+                bestTime: '10-12月、3-5月（避开暑期人潮）',
+                weather: '亚热带海洋性气候，夏季炎热多雨，冬季温暖干燥',
+                specialNotes: '深圳是年轻人的城市，节奏快，消费略高于广州，但美食、娱乐丰富'
+            },
+            '珠海': {
+                route: '广州 → 广珠西线高速(S55) → 珠海（约150公里，2小时）',
+                scenery: '经过中山、江门，可远眺伶仃洋海景，港珠澳大桥雄伟壮观',
+
+                itinerary: [
+                    {
+                        day: 1,
+                        title: '广州出发 → 珠海长隆',
+                        schedule: [
+                            { time: '09:00-11:00', activity: '广州出发，驾车前往珠海', transport: '广珠西线高速', cost: '油费约90元，过路费约65元', tips: '避开节假日，高速较通畅' },
+                            { time: '11:00-12:30', activity: '抵达珠海，酒店入住，午餐', location: '横琴新区酒店', food: '推荐：横琴蚝庄、湾仔海鲜街', cost: '午餐约200元' },
+                            { time: '13:00-20:00', activity: '长隆海洋王国游玩', location: '横琴长隆', tickets: '成人票约380元', tips: '提前网购有优惠，建议穿舒适鞋子，园区很大' },
+                            { time: '20:00-21:30', activity: '晚餐 + 休息', location: '横琴美食街', food: '粤菜、海鲜', cost: '晚餐约250元' }
+                        ]
+                    },
+                    {
+                        day: 2,
+                        title: '珠海市区 + 情侣路',
+                        schedule: [
+                            { time: '09:00-11:00', activity: '参观圆明新园', location: '珠海圆明新园', tickets: '约120元', tips: '仿圆明园建筑，适合拍照' },
+                            { time: '11:30-13:00', activity: '午餐', location: '湾仔码头附近', food: '斗门重壳蟹、海鲜', cost: '约300元' },
+                            { time: '14:00-18:00', activity: '情侣路骑行、珠海渔女', location: '情侣路', tickets: '免费，租自行车30元', tips: '沿海骑行，傍晚看日落最美' },
+                            { time: '18:30-20:00', activity: '晚餐', location: '拱北口岸美食街', food: '澳门葡式蛋挞、猪扒包', cost: '约200元' },
+                            { time: '20:00-21:30', activity: '情侣路夜景、日月贝', tips: '珠海大剧院夜景很美，可以散步拍照' }
+                        ]
+                    },
+                    {
+                        day: 3,
+                        title: '外伶仃岛一日游',
+                        schedule: [
+                            { time: '08:00-09:30', activity: '前往香洲码头', transport: '自驾或打车', cost: '停车费约50元/天' },
+                            { time: '10:00-11:30', activity: '乘船前往外伶仃岛', location: '香洲码头', tickets: '船票往返约200元', tips: '需提前订票，夏季建议早上出发' },
+                            { time: '12:00-13:30', activity: '岛上午餐', food: '海鲜、海胆炒饭', cost: '约300元' },
+                            { time: '14:00-17:00', activity: '岛上游玩、沙滩、登山', tips: '可以环岛徒步，风景很美，记得带防晒' },
+                            { time: '17:30-19:00', activity: '返回珠海市区', transport: '乘船返回' },
+                            { time: '19:30-21:00', activity: '晚餐', location: '湾仔海鲜街', food: '生蚝、花蟹', cost: '约250元' }
+                        ]
+                    },
+                    {
+                        day: 4,
+                        title: '东澳岛或野狸岛',
+                        schedule: [
+                            { time: '09:00-11:30', activity: '野狸岛公园', location: '吉大野狸岛', tickets: '免费', tips: '可以看到港珠澳大桥，适合晨练' },
+                            { time: '12:00-13:30', activity: '午餐', location: '吉大商圈', food: '粤式茶餐厅', cost: '约150元' },
+                            { time: '14:00-17:00', activity: '珠海博物馆、城市规划展览馆', tickets: '免费', tips: '了解珠海历史文化' },
+                            { time: '17:30-19:00', activity: '海滨公园、海天驿站', location: '海滨公园', tips: '看日落、拍照' },
+                            { time: '19:00-21:00', activity: '晚餐 + 购物', location: '华发商都、免税店', food: '各类美食', cost: '约200元' }
+                        ]
+                    },
+                    {
+                        day: 5,
+                        title: '返程日 - 港珠澳大桥',
+                        schedule: [
+                            { time: '09:00-11:00', activity: '港珠澳大桥观景', location: '港珠澳大桥珠海口岸', tips: '可以远观大桥，拍照留念' },
+                            { time: '11:30-13:00', activity: '午餐', location: '横琴或拱北', food: '最后品尝珠海美食', cost: '约200元' },
+                            { time: '14:00-16:00', activity: '返回广州', transport: '广珠西线高速', cost: '油费约90元，过路费约65元' },
+                            { time: '16:00', activity: '抵达广州，旅程结束' }
+                        ]
+                    }
+                ],
+
+                attractions: [
+                    { name: '长隆海洋王国', intro: '全球最大海洋主题乐园，有鲸鲨馆、极地馆等', time: '建议游玩全天', tickets: '380元（网购优惠）', tips: '提前下载APP，查看表演时间，烟花秀不容错过' },
+                    { name: '情侣路', intro: '28公里海滨长廊，珠海标志性景点', time: '建议游玩3小时', tickets: '免费', tips: '租自行车骑行，傍晚最美' },
+                    { name: '珠海渔女', intro: '珠海城市象征雕像', time: '30分钟', tickets: '免费', tips: '适合拍照打卡' },
+                    { name: '圆明新园', intro: '按1:1比例仿建圆明园', time: '建议游玩3小时', tickets: '120元', tips: '适合摄影，古装照很出片' },
+                    { name: '外伶仃岛', intro: '珠海最美海岛，文天祥曾被囚于此', time: '建议游玩半天', tickets: '船票往返200元', tips: '夏季最佳，可以游泳、潜水' },
+                    { name: '港珠澳大桥', intro: '世界最长跨海大桥', time: '观景1小时', tickets: '免费观景', tips: '可在珠海口岸远观，非常壮观' }
+                ],
+
+                food: [
+                    { name: '横琴生蚝', location: '横琴蚝庄、生蚝一条街', price: '人均100-150元', recommend: '蒜蓉生蚝、芝士焗生蚝、原味生蚝', tips: '横琴生蚝肥美多汁，必吃' },
+                    { name: '斗门重壳蟹', location: '斗门海鲜市场、湾仔海鲜街', price: '时价，约150-300元/斤', recommend: '清蒸、姜葱炒', tips: '秋季最肥美' },
+                    { name: '白藤莲藕', location: '本地餐馆', price: '约30-50元/份', recommend: '莲藕排骨汤、炒莲藕', tips: '斗门特产，粉糯香甜' },
+                    { name: '海鲜大餐', location: '湾仔海鲜街、南屏海鲜市场', price: '人均200-400元', recommend: '花蟹、濑尿虾、石斑鱼', tips: '可以自己买海鲜加工' },
+                    { name: '粤式早茶', location: '唐宫、星皇、富苑', price: '人均60-100元', recommend: '虾饺、烧卖、凤爪、肠粉', tips: '早上10点前去，茶位便宜' }
+                ],
+
+                budget: {
+                    transport: { fuel: 220, toll: 130, parking: 100, total: 450 },
+                    accommodation: { hotel: '300-400元/晚', nights: 4, total: 1500 },
+                    food: { breakfast: 40, lunch: 200, dinner: 250, total: 2450 },
+                    tickets: { attractions: 900, others: 300, total: 1200 },
+                    shopping: 500,
+                    total: 6100,
+                    notes: '以上为2人预算，人均约3050元'
+                },
+
+                tips: [
+                    { title: '交通', content: '珠海市区不大，建议住横琴或吉大，去长隆和市区都方便' },
+                    { title: '住宿', content: '横琴酒店多，靠近长隆；吉大靠近市中心，选择多' },
+                    { title: '最佳时间', content: '10-12月、3-5月最佳，避开台风季' },
+                    { title: '海岛', content: '外伶仃岛船票紧张，需提前3-7天预订' },
+                    { title: '美食', content: '湾仔海鲜街、横琴蚝庄、拱北美食街' },
+                    { title: '停车', content: '景点停车：长隆30元/次，商场消费免费停车' }
+                ],
+
+                bestTime: '10-12月、3-5月（气候宜人）',
+                weather: '亚热带海洋性气候，夏季炎热，7-9月有台风',
+                specialNotes: '珠海是浪漫之城，生活节奏慢，适合度假休闲，靠近澳门可顺便游玩'
+            },
+            '桂林': {
+                route: '广州 → 广清高速 → 二广高速(G55) → 桂林（约450公里，5.5小时）',
+                scenery: '途经贺州十八水、山水田园风光，喀斯特地貌逐渐显现，山峦叠翠',
+
+                itinerary: [
+                    {
+                        day: 1,
+                        title: '广州出发 → 桂林市区',
+                        schedule: [
+                            { time: '08:00-13:30', activity: '广州出发，驾车前往桂林', transport: '二广高速', cost: '油费约320元，过路费约175元', tips: '中途可在贺州服务区休息，约3小时车程时休息15分钟' },
+                            { time: '13:30-15:00', activity: '抵达桂林，酒店入住，午餐', location: '桂林市区酒店（象山区或七星区）', food: '推荐：崇善米粉店、小南国桂林米粉', cost: '午餐约80元' },
+                            { time: '15:30-18:00', activity: '象鼻山公园游玩', location: '象鼻山', tickets: '55元', tips: '桂林城市地标，在江边可拍摄最佳角度' },
+                            { time: '18:30-20:00', activity: '晚餐', location: '正阳步行街', food: '啤酒鱼、桂林米粉、十八酿', cost: '晚餐约150元' },
+                            { time: '20:00-21:30', activity: '两江四湖夜游', location: '日月双塔', tickets: '免费步行或夜游船190元', tips: '夜景非常美，建议步行游览免费' }
+                        ]
+                    },
+                    {
+                        day: 2,
+                        title: '漓江精华游',
+                        schedule: [
+                            { time: '07:30-08:30', activity: '前往漓江码头', transport: '自驾到磨盘山码头', cost: '停车费30元' },
+                            { time: '09:00-13:00', activity: '漓江竹筏游（杨堤-兴坪段）', location: '漓江', tickets: '约118元/人', tips: '最精华段落，20元人民币背景在这里，建议坐前排拍照' },
+                            { time: '13:00-14:30', activity: '兴坪古镇午餐', location: '兴坪古镇', food: '农家菜、啤酒鱼', cost: '约150元' },
+                            { time: '14:30-16:00', activity: '兴坪古镇游览', tips: '古朴小镇，登老寨山顶俯瞰漓江' },
+                            { time: '16:30-18:00', activity: '返回桂林市区', transport: '自驾返回', cost: '油费约60元' },
+                            { time: '18:30-20:00', activity: '晚餐', location: '桂林市区', food: '荔浦芋扣肉、啤酒鱼', cost: '约180元' }
+                        ]
+                    },
+                    {
+                        day: 3,
+                        title: '龙脊梯田一日游',
+                        schedule: [
+                            { time: '07:30-10:00', activity: '前往龙胜龙脊梯田', transport: '自驾约90公里，山路', cost: '油费约80元，停车费20元', tips: '山路弯多，注意安全' },
+                            { time: '10:00-12:00', activity: '金坑大寨梯田游览', location: '金坑大寨', tickets: '100元', tips: '乘缆车上山，可到观景台1、2、3号' },
+                            { time: '12:00-13:30', activity: '午餐', location: '龙脊寨子', food: '竹筒饭、竹筒鸡、酿豆腐', cost: '约150元' },
+                            { time: '13:30-16:00', activity: '继续游览梯田，平安寨', tips: '下午光线更好，适合拍照' },
+                            { time: '16:30-19:00', activity: '返回桂林市区', transport: '自驾返回' },
+                            { time: '19:30-21:00', activity: '晚餐', location: '市区', food: '恭城油茶、桂林米粉', cost: '约100元' }
+                        ]
+                    },
+                    {
+                        day: 4,
+                        title: '银子岩 + 古东瀑布',
+                        schedule: [
+                            { time: '08:30-09:30', activity: '前往银子岩', transport: '自驾约30公里', cost: '油费约30元' },
+                            { time: '09:30-11:30', activity: '银子岩溶洞游览', location: '荔浦银子岩', tickets: '65元', tips: '中国最美溶洞之一，钟乳石很壮观' },
+                            { time: '12:00-13:00', activity: '午餐', location: '荔浦县城', food: '荔浦芋扣肉、荔浦米饼', cost: '约120元' },
+                            { time: '14:00-17:00', activity: '古东瀑布攀爬', location: '古东瀑布', tickets: '75元', tips: '可以攀爬的瀑布，记得带拖鞋和换洗衣物' },
+                            { time: '17:30-19:00', activity: '返回市区，晚餐', location: '正阳步行街', food: '小吃街美食', cost: '约150元' },
+                            { time: '19:30-21:00', activity: '《印象刘三姐》演出（可选）', location: '漓江剧场', tickets: '约238元', tips: '张艺谋导演，实景演出很震撼' }
+                        ]
+                    },
+                    {
+                        day: 5,
+                        title: '返程日 - 靖江王府 + 返回广州',
+                        schedule: [
+                            { time: '09:00-11:00', activity: '靖江王府、独秀峰', location: '桂林市区', tickets: '100元', tips: '明代藩王府，可登独秀峰俯瞰桂林城' },
+                            { time: '11:30-13:00', activity: '午餐 + 采购特产', location: '市区', food: '最后品尝桂林美食', cost: '约150元', tips: '可买桂林三宝：辣椒酱、豆腐乳、三花酒' },
+                            { time: '14:00-19:00', activity: '返回广州', transport: '二广高速', cost: '油费约320元，过路费约175元', tips: '下午出发避开车流' },
+                            { time: '19:00', activity: '抵达广州，旅程结束' }
+                        ]
+                    }
+                ],
+
+                attractions: [
+                    { name: '漓江', intro: '世界自然遗产，桂林山水精华，20元人民币背景图', time: '竹筏游4小时', tickets: '118元（杨堤-兴坪）', tips: '选择杨堤到兴坪段最经典，九马画山、黄布倒影都在此段' },
+                    { name: '象鼻山', intro: '桂林城徽，形似大象鼻子伸入漓江饮水', time: '1-2小时', tickets: '55元', tips: '江边拍照最佳，可以等日落' },
+                    { name: '龙脊梯田', intro: '世界梯田之冠，壮观的农耕文明', time: '半天到一天', tickets: '100元', tips: '5月灌水、9月金秋最美，建议坐缆车节省体力' },
+                    { name: '银子岩', intro: '溶洞奇观，汇集不同地质年代的钟乳石', time: '1-2小时', tickets: '65元', tips: '洞内温度低，带件外套' },
+                    { name: '两江四湖', intro: '桂林城市名片，夜景迷人', time: '2-3小时', tickets: '步行免费，游船190元', tips: '建议晚上步行游览，免费又美' },
+                    { name: '兴坪古镇', intro: '千年古镇，20元人民币背景地', time: '2小时', tickets: '免费', tips: '从老寨山顶俯瞰漓江最美' }
+                ],
+
+                food: [
+                    { name: '桂林米粉', location: '崇善米粉、又益轩、石记米粉', price: '人均15-25元', recommend: '卤菜粉、三鲜粉、牛腩粉', tips: '早餐必吃，桂林人的灵魂早餐' },
+                    { name: '啤酒鱼', location: '阿甘酒家、椿记烧鹅、大师傅啤酒鱼', price: '人均60-100元', recommend: '漓江啤酒鱼、剑骨鱼', tips: '阳朔的最正宗，桂林也不错' },
+                    { name: '十八酿', location: '椿记烧鹅、小南国', price: '人均50-80元', recommend: '田螺酿、豆腐酿、苦瓜酿', tips: '桂林特色，各种食材塞入肉馅' },
+                    { name: '荔浦芋扣肉', location: '正阳汤城、椿记烧鹅', price: '38-58元/份', recommend: '荔浦芋扣肉', tips: '肥而不腻，芋头香滑' },
+                    { name: '恭城油茶', location: '正阳步行街恭城油茶店', price: '人均20-30元', recommend: '油茶+米花+花生', tips: '咸香味，配小吃一起吃' }
+                ],
+
+                budget: {
+                    transport: { fuel: 650, toll: 350, parking: 80, total: 1080 },
+                    accommodation: { hotel: '250-300元/晚', nights: 4, total: 1200 },
+                    food: { breakfast: 20, lunch: 150, dinner: 180, total: 1750 },
+                    tickets: { attractions: 700, others: 200, total: 900 },
+                    shopping: 300,
+                    total: 5230,
+                    notes: '以上为2人预算，人均约2615元'
+                },
+
+                tips: [
+                    { title: '交通', content: '桂林市区不大，建议住市中心，景点分散建议自驾' },
+                    { title: '住宿', content: '建议住象山区或七星区，去哪都方便' },
+                    { title: '最佳时间', content: '4-10月最佳，4-5月烟雨漓江，9-10月秋高气爽' },
+                    { title: '漓江游览', content: '精华段是杨堤-兴坪，约4小时，坐竹筏最佳' },
+                    { title: '龙脊梯田', content: '5月灌水期、9-10月金秋最美，山路弯多注意安全' },
+                    { title: '美食街', content: '正阳步行街、尚水美食街、西城路步行街' }
+                ],
+
+                bestTime: '4-5月（烟雨漓江）、9-10月（秋高气爽）',
+                weather: '亚热带季风气候，雨季4-8月，夏季炎热潮湿',
+                specialNotes: '桂林山水甲天下，阳朔山水甲桂林。景点分散，建议自驾或包车游玩'
+            },
+            '阳朔': {
+                route: '广州 → 广清高速 → 二广高速 → 阳朔（约480公里，6小时）',
+                scenery: '沿途山水风光渐入佳境，喀斯特地貌典型，阳朔山水甲桂林',
+
+                itinerary: [
+                    {day: 1, title: '广州出发 → 阳朔西街', schedule: [
+                        {time: '08:00-14:00', activity: '广州出发前往阳朔', transport: '二广高速', cost: '油费约350元，过路费约180元', tips: '中途在贺州服务区休息'},
+                        {time: '14:00-15:30', activity: '抵达阳朔，酒店入住', location: '阳朔县城', food: '啤酒鱼、米粉', cost: '约120元'},
+                        {time: '16:00-18:00', activity: '西街闲逛', tickets: '免费', tips: '千年古街，白天清净'},
+                        {time: '18:30-20:00', activity: '晚餐', location: '西街', food: '啤酒鱼、田螺酿', cost: '约180元'},
+                        {time: '20:00-22:00', activity: '西街夜景', tips: '酒吧街，夜晚热闹'}
+                    ]},
+                    {day: 2, title: '遇龙河漂流 + 十里画廊', schedule: [
+                        {time: '09:00-12:00', activity: '遇龙河竹筏漂流', location: '金龙桥-旧县段', tickets: '240元/筏', tips: '全程人工撑筏，最美漂流'},
+                        {time: '12:00-13:30', activity: '午餐', location: '旧县村', food: '农家菜', cost: '约100元'},
+                        {time: '14:00-17:00', activity: '十里画廊骑行', tickets: '租车20-30元', tips: '沿途大榕树、月亮山'},
+                        {time: '19:30-21:30', activity: '《印象刘三姐》演出', tickets: '238元', tips: '张艺谋导演，实景演出'}
+                    ]},
+                    {day: 3, title: '漓江精华 + 兴坪古镇', schedule: [
+                        {time: '09:00-13:00', activity: '漓江竹筏漂流', location: '杨堤-兴坪', tickets: '118元/人', tips: '20元人民币背景段'},
+                        {time: '14:30-17:00', activity: '兴坪古镇、老寨山', tips: '登山俯瞰漓江，拍20元同款照'}
+                    ]},
+                    {day: 4, title: '银子岩 + 世外桃源', schedule: [
+                        {time: '09:30-11:30', activity: '银子岩溶洞', tickets: '65元', tips: '钟乳石奇观'},
+                        {time: '14:00-17:00', activity: '世外桃源景区', tickets: '95元', tips: '田园风光，民族表演'}
+                    ]},
+                    {day: 5, title: '返程', schedule: [
+                        {time: '13:00-19:00', activity: '返回广州', cost: '油费约350元，过路费约180元'}
+                    ]}
+                ],
+
+                attractions: [
+                    {name: '遇龙河漂流', intro: '人工撑筏，水质清澈', time: '3小时', tickets: '240元/筏', tips: '金龙桥至旧县段最美'},
+                    {name: '西街', intro: '千年古街，中西文化', time: '2-3小时', tickets: '免费', tips: '晚上热闹，酒吧众多'},
+                    {name: '十里画廊', intro: '骑行游览沿途景点', time: '3-4小时', tickets: '租车20-30元', tips: '大榕树、月亮山'},
+                    {name: '漓江精华段', intro: '20元人民币背景', time: '4小时', tickets: '118元', tips: '九马画山、黄布倒影'}
+                ],
+
+                food: [
+                    {name: '啤酒鱼', location: '谢三姐、大师傅', price: '60-100元', recommend: '漓江啤酒鱼', tips: '阳朔招牌菜'},
+                    {name: '田螺酿', location: '西街餐馆', price: '15-25元', recommend: '田螺酿', tips: '螺肉塞猪肉'},
+                    {name: '桂林米粉', location: '石记米粉', price: '10-15元', recommend: '卤菜粉', tips: '早餐必吃'}
+                ],
+
+                budget: {
+                    transport: {fuel: 700, toll: 360, parking: 70, total: 1130},
+                    accommodation: {hotel: '200-250元/晚', nights: 4, total: 1000},
+                    food: {breakfast: 15, lunch: 120, dinner: 150, total: 1425},
+                    tickets: {attractions: 750, others: 238, total: 988},
+                    shopping: 200,
+                    total: 4743,
+                    notes: '以上为2人预算，人均约2372元'
+                },
+
+                tips: [
+                    {title: '交通', content: '县城不大，步行或租自行车，十里画廊适合骑行'},
+                    {title: '住宿', content: '西街附近方便，或遇龙河边民宿田园风光好'},
+                    {title: '最佳时间', content: '4-10月，烟雨漓江4-5月，秋高气爽9-10月'},
+                    {title: '漂流', content: '遇龙河全年可漂，漓江雨季水大更美'}
+                ],
+
+                bestTime: '4-5月（烟雨）、9-10月（秋爽）',
+                weather: '亚热带季风，雨季4-8月',
+                specialNotes: '阳朔山水甲桂林，比桂林更安静，田园风光更美'
+            },
+            '厦门': {
+                route: '广州 → 广惠高速 → 沈海高速(G15) → 厦门（约750公里，8-9小时）',
+                scenery: '途经潮汕平原、闽南沿海，海岸线风光秀美，红砖古厝点缀山间',
+
+                itinerary: [
+                    {
+                        day: 1,
+                        title: '广州出发 → 厦门岛内',
+                        schedule: [
+                            { time: '07:00-15:30', activity: '广州出发，驾车前往厦门', transport: '沈海高速', cost: '油费约450元，过路费约250元', tips: '路程较长，建议在汕头或潮州服务区休息用餐' },
+                            { time: '15:30-17:00', activity: '抵达厦门，酒店入住，休息', location: '思明区酒店', tips: '建议住中山路或环岛路附近' },
+                            { time: '17:30-19:00', activity: '中山路步行街晚餐', location: '中山路', food: '沙茶面、海蛎煎、烧肉粽', cost: '约150元' },
+                            { time: '19:30-21:30', activity: '中山路夜市、骑楼建筑', tips: '欣赏骑楼，品尝小吃' }
+                        ]
+                    },
+                    {
+                        day: 2,
+                        title: '鼓浪屿一日游',
+                        schedule: [
+                            { time: '08:00-09:30', activity: '前往码头，乘船前往鼓浪屿', location: '厦鼓码头', tickets: '往返船票35元', tips: '提前网上订票，坐三丘田码头离景点近' },
+                            { time: '09:30-12:00', activity: '日光岩、菽庄花园', location: '鼓浪屿', tickets: '联票100元', tips: '日光岩是最高点，可俯瞰全岛' },
+                            { time: '12:00-13:30', activity: '午餐', location: '龙头路', food: '鱼丸汤、海蛎饼、叶氏麻糍', cost: '约150元' },
+                            { time: '13:30-17:00', activity: '钢琴博物馆、风琴博物馆、万国建筑', tips: '漫步小巷，感受万国建筑' },
+                            { time: '17:30-18:30', activity: '乘船返回厦门' },
+                            { time: '19:00-21:00', activity: '晚餐 + 环岛路夜景', location: '环岛路', food: '海鲜', cost: '约250元' }
+                        ]
+                    },
+                    {
+                        day: 3,
+                        title: '厦门大学 + 南普陀 + 曾厝垵',
+                        schedule: [
+                            { time: '08:30-11:00', activity: '厦门大学游览', location: '厦门大学', tickets: '免费（需预约）', tips: '中国最美大学，芙蓉隧道必打卡，提前3天预约' },
+                            { time: '11:30-13:00', activity: '午餐', location: '厦大附近', food: '沙坡尾美食、土笋冻', cost: '约120元' },
+                            { time: '13:30-15:30', activity: '南普陀寺', tickets: '免费', tips: '可爬五老峰俯瞰厦大和海景' },
+                            { time: '16:00-19:00', activity: '曾厝垵文艺村', tips: '文艺村落，特色小店、美食' },
+                            { time: '19:00-21:00', activity: '晚餐', location: '曾厝垵', food: '姜母鸭、海鲜', cost: '约200元' }
+                        ]
+                    },
+                    {
+                        day: 4,
+                        title: '环岛路 + 集美学村',
+                        schedule: [
+                            { time: '08:00-11:00', activity: '环岛路骑行', location: '环岛路', tickets: '租自行车30-50元', tips: '沿海骑行，会展中心、椰风寨都很美' },
+                            { time: '11:30-13:00', activity: '午餐', food: '海鲜餐厅', cost: '约200元' },
+                            { time: '14:00-17:30', activity: '集美学村、陈嘉庚纪念馆', location: '集美区', tickets: '免费', tips: '嘉庚建筑风格独特，龙舟池、鳌园值得看' },
+                            { time: '18:00-20:00', activity: '晚餐', food: '闽南菜', cost: '约180元' },
+                            { time: '20:30-22:00', activity: '双子塔夜景', tips: '厦门新地标' }
+                        ]
+                    },
+                    {
+                        day: 5,
+                        title: '返程日 - 胡里山炮台 + 返回广州',
+                        schedule: [
+                            { time: '09:00-11:00', activity: '胡里山炮台', tickets: '25元', tips: '近代海防遗址，眺望金门' },
+                            { time: '11:30-13:00', activity: '午餐 + 采购特产', cost: '约150元', tips: '可买鱼皮花生、馅饼、肉松' },
+                            { time: '14:00-22:00', activity: '返回广州', transport: '沈海高速', cost: '油费约450元，过路费约250元', tips: '路程较长，注意安全' },
+                            { time: '22:00', activity: '抵达广州，旅程结束' }
+                        ]
+                    }
+                ],
+
+                attractions: [
+                    { name: '鼓浪屿', intro: '世界文化遗产，万国建筑博览，钢琴之岛', time: '建议游玩全天', tickets: '船票35元+景点联票100元', tips: '提前订票，避开周末，三丘田码头最方便' },
+                    { name: '厦门大学', intro: '中国最美大学，芙蓉隧道涂鸦墙', time: '2-3小时', tickets: '免费（需预约）', tips: '提前3天微信预约' },
+                    { name: '南普陀寺', intro: '闽南佛教圣地，千年古刹', time: '2小时', tickets: '免费', tips: '可爬五老峰俯瞰海景' },
+                    { name: '曾厝垵', intro: '文艺渔村，小清新打卡地', time: '2-3小时', tickets: '免费', tips: '文艺小店、美食，适合拍照' },
+                    { name: '环岛路', intro: '最美马拉松赛道', time: '3-4小时', tickets: '租自行车30-50元', tips: '傍晚骑行看日落' },
+                    { name: '集美学村', intro: '嘉庚建筑风格独特', time: '2-3小时', tickets: '免费', tips: '龙舟池、鳌园值得看' }
+                ],
+
+                food: [
+                    { name: '沙茶面', location: '乌糖沙茶面、月华沙茶面', price: '人均20-30元', recommend: '沙茶海鲜面、沙茶牛肉面', tips: '厦门特色，沙茶酱香浓' },
+                    { name: '海蛎煎', location: '林记海蛎煎、莲欢海蛎煎', price: '人均30-40元', recommend: '海蛎煎、虾仁煎', tips: '外酥里嫩，海蛎鲜美' },
+                    { name: '土笋冻', location: '西门土笋冻', price: '人均15-25元', recommend: '土笋冻、烧肉粽', tips: '土笋冻Q弹爽口，大胆尝试' },
+                    { name: '姜母鸭', location: '莲花村姜母鸭', price: '人均50-80元', recommend: '姜母鸭、鸭肠', tips: '秋冬滋补，姜味浓郁' },
+                    { name: '花生汤', location: '黄则和花生汤', price: '人均10-15元', recommend: '花生汤、麻糍', tips: '甜品，花生软烂香甜' }
+                ],
+
+                budget: {
+                    transport: { fuel: 900, toll: 500, parking: 100, ferry: 70, total: 1570 },
+                    accommodation: { hotel: '300-400元/晚', nights: 4, total: 1400 },
+                    food: { breakfast: 25, lunch: 150, dinner: 200, total: 1875 },
+                    tickets: { attractions: 500, others: 200, total: 700 },
+                    shopping: 300,
+                    total: 5845,
+                    notes: '以上为2人预算，人均约2923元'
+                },
+
+                tips: [
+                    { title: '交通', content: '岛内地铁+公交很方便，车可停酒店，去鼓浪屿车停码头' },
+                    { title: '住宿', content: '建议住思明区（中山路、环岛路），去哪都方便' },
+                    { title: '最佳时间', content: '3-5月、9-11月最佳，避开暑期和台风季' },
+                    { title: '鼓浪屿', content: '船票提前1-2天订，建议平日去' },
+                    { title: '厦大预约', content: '需提前3天预约，周末名额少' },
+                    { title: '美食街', content: '中山路、曾厝垵、沙坡尾、八市' }
+                ],
+
+                bestTime: '3-5月（春暖花开）、9-11月（秋高气爽）',
+                weather: '亚热带海洋性气候，夏季炎热，7-9月有台风',
+                specialNotes: '文艺小清新之城，节奏慢。路程较远，可在潮汕中转休息'
+            },
+            '长沙': {
+                route: '广州 → 京港澳高速(G4) → 长沙（约650公里，7小时）',
+                scenery: '途经韶关丹霞山地貌、湘南山区，进入湖南后湘江两岸风光秀美',
+
+                itinerary: [
+                    {day: 1, title: '广州出发 → 长沙市区', schedule: [
+                        {time: '08:00-15:00', activity: '广州出发前往长沙', transport: '京港澳高速', cost: '油费约375元，过路费约200元', tips: '中途在郴州服务区休息'},
+                        {time: '15:00-16:30', activity: '抵达长沙，酒店入住', location: '五一广场或岳麓区', tips: '五一广场是市中心，岳麓区靠近岳麓山'},
+                        {time: '17:00-19:00', activity: '太平老街 + 晚餐', location: '太平街', food: '臭豆腐、糖油粑粑、姊妹团子', cost: '约100元', tips: '太平街是长沙美食街，小吃众多'},
+                        {time: '19:30-21:30', activity: '坡子街、黄兴路步行街', location: '坡子街', tips: '火宫殿、现代中国茶在这里，很热闹'}
+                    ]},
+                    {day: 2, title: '岳麓山 + 橘子洲', schedule: [
+                        {time: '08:30-12:00', activity: '岳麓山 + 岳麓书院', location: '岳麓山', tickets: '岳麓山免费，岳麓书院50元', tips: '中国四大书院之一，爱晚亭必打卡'},
+                        {time: '12:00-13:30', activity: '午餐', location: '岳麓山下', food: '湘菜馆', cost: '约150元'},
+                        {time: '14:00-17:00', activity: '橘子洲头', location: '橘子洲', tickets: '免费', tips: '毛泽东青年雕像，周末晚有烟花秀'},
+                        {time: '18:00-20:00', activity: '晚餐', location: '解放西路', food: '口味虾、剁椒鱼头', cost: '约200元', tips: '文和友龙虾馆很火，需排队'}
+                    ]},
+                    {day: 3, title: '湖南省博物馆 + IFS', schedule: [
+                        {time: '09:00-12:00', activity: '湖南省博物馆', location: '省博物馆', tickets: '免费（需预约）', tips: '马王堆汉墓、辛追夫人，中国十大博物馆之一'},
+                        {time: '12:00-13:30', activity: '午餐', location: '博物馆附近', food: '湘菜', cost: '约120元'},
+                        {time: '14:00-17:00', activity: 'IFS国金中心', location: 'IFS', tips: '长沙地标，超级文和友在这，购物美食'},
+                        {time: '17:30-19:00', activity: '超级文和友', location: 'IFS 7楼', food: '小龙虾、臭豆腐', cost: '约250元', tips: '网红餐厅，复古场景，需排队2-3小时'},
+                        {time: '20:00-22:00', activity: '解放西路酒吧街', tips: '长沙夜生活圣地'}
+                    ]},
+                    {day: 4, title: '网红打卡一日游', schedule: [
+                        {time: '09:00-11:00', activity: '都正街、化龙池', location: '都正街', tips: '古街巷，文艺小店，适合拍照'},
+                        {time: '11:30-13:00', activity: '火宫殿午餐', location: '火宫殿', food: '臭豆腐、糖油粑粑、姊妹团子', cost: '约100元', tips: '长沙老字号美食地标'},
+                        {time: '14:00-16:00', activity: '谢子龙影像艺术馆', location: '洋湖湿地', tickets: '免费', tips: '网红建筑，拍照圣地'},
+                        {time: '16:30-18:00', activity: '洋湖湿地公园', tickets: '免费', tips: '城市绿肺，适合散步'},
+                        {time: '18:30-20:30', activity: '晚餐', location: '文和友老长沙龙虾馆', food: '口味虾、小炒肉', cost: '约200元'}
+                    ]},
+                    {day: 5, title: '返程', schedule: [
+                        {time: '09:00-11:00', activity: '采购特产', location: '步步高、友阿', tips: '买臭豆腐、槟榔、酱板鸭'},
+                        {time: '11:30-12:30', activity: '午餐', food: '最后一顿湘菜', cost: '约150元'},
+                        {time: '13:00-20:00', activity: '返回广州', transport: '京港澳高速', cost: '油费约375元，过路费约200元'}
+                    ]}
+                ],
+
+                attractions: [
+                    {name: '岳麓山', intro: '中国四大赏枫胜地，岳麓书院', time: '半天', tickets: '山免费，书院50元', tips: '爱晚亭、岳麓书院必去'},
+                    {name: '橘子洲', intro: '湘江江心洲，毛泽东雕像', time: '2-3小时', tickets: '免费', tips: '周六晚8点半有烟花秀'},
+                    {name: '湖南省博物馆', intro: '马王堆汉墓、辛追夫人', time: '3小时', tickets: '免费需预约', tips: '提前3天微信预约，周一闭馆'},
+                    {name: '太平老街', intro: '长沙美食街', time: '2小时', tickets: '免费', tips: '臭豆腐、糖油粑粑必吃'},
+                    {name: 'IFS国金中心', intro: '超级文和友所在地', time: '2小时', tickets: '免费', tips: '7楼文和友需排队2-3小时'}
+                ],
+
+                food: [
+                    {name: '臭豆腐', location: '黑色经典、火宫殿', price: '15-20元', recommend: '黑色经典臭豆腐', tips: '长沙名片，外焦里嫩'},
+                    {name: '口味虾', location: '文和友、南门口', price: '80-150元', recommend: '麻辣口味虾', tips: '长沙夜宵之王'},
+                    {name: '糖油粑粑', location: '李公庙、火宫殿', price: '5-10元', recommend: '糖油粑粑', tips: '外酥里糯，甜而不腻'},
+                    {name: '剁椒鱼头', location: '湘菜馆', price: '68-128元', recommend: '剁椒鱼头', tips: '湘菜招牌，鲜辣'},
+                    {name: '小炒肉', location: '各湘菜馆', price: '38-58元', recommend: '农家小炒肉', tips: '湘菜经典，下饭神器'}
+                ],
+
+                budget: {
+                    transport: {fuel: 750, toll: 400, parking: 80, total: 1230},
+                    accommodation: {hotel: '200-250元/晚', nights: 4, total: 1000},
+                    food: {breakfast: 20, lunch: 120, dinner: 200, total: 1700},
+                    tickets: {attractions: 200, others: 100, total: 300},
+                    shopping: 200,
+                    total: 4430,
+                    notes: '以上为2人预算，人均约2215元'
+                },
+
+                tips: [
+                    {title: '交通', content: '地铁很方便，景点集中，不建议开车进市区'},
+                    {title: '住宿', content: '五一广场、岳麓区都方便，避开橘子洲周末烟花时段'},
+                    {title: '最佳时间', content: '3-5月、9-11月，秋季可赏枫'},
+                    {title: '美食', content: '文和友需排队2-3小时，可提前取号；臭豆腐街边最正宗'},
+                    {title: '辣度', content: '湘菜很辣，不吃辣的要提前说明'},
+                    {title: '博物馆', content: '省博需提前3天预约，周一闭馆'}
+                ],
+
+                bestTime: '3-5月（春暖）、9-11月（秋季赏枫）',
+                weather: '亚热带季风，夏季炎热潮湿，冬季湿冷',
+                specialNotes: '长沙是网红美食之城，娱乐之都。湘菜很辣，不吃辣的慎重。文和友等网红店排队久'
+            },
+            '张家界': {
+                route: '广州 → 京港澳高速 → 长张高速 → 张家界（约850公里，9.5小时）',
+                scenery: '途经湘南山区、武陵源山脉，山峦起伏，张家界奇峰异石渐现',
+
+                itinerary: [
+                    {day: 1, title: '广州出发 → 张家界市区', schedule: [
+                        {time: '07:00-16:30', activity: '广州出发前往张家界', transport: '京港澳→长张高速', cost: '油费约500元，过路费约275元', tips: '路程长，中途在衡阳服务区休息午餐'},
+                        {time: '17:00-18:30', activity: '抵达张家界，酒店入住', location: '武陵源区或市区', tips: '武陵源区离景区近'},
+                        {time: '19:00-21:00', activity: '晚餐 + 溪布街', location: '溪布街', food: '三下锅、土家腊肉', cost: '约150元', tips: '溪布街是民俗商业街，晚上热闹'}
+                    ]},
+                    {day: 2, title: '张家界国家森林公园', schedule: [
+                        {time: '08:00-08:30', activity: '前往森林公园', transport: '自驾或景区班车', cost: '停车费50元'},
+                        {time: '08:30-12:00', activity: '金鞭溪徒步', location: '金鞭溪', tickets: '森林公园门票228元/人（4天有效）', tips: '全程7.5公里，溪水清澈，负氧离子高'},
+                        {time: '12:00-13:30', activity: '午餐', location: '景区内', food: '快餐', cost: '约80元'},
+                        {time: '14:00-18:00', activity: '袁家界景区', location: '袁家界', tips: '乘百龙天梯上山，游览阿凡达悬浮山原型-哈利路亚山'},
+                        {time: '18:30-20:00', activity: '返回酒店，晚餐', food: '岩耳炖鸡', cost: '约180元'}
+                    ]},
+                    {day: 3, title: '天门山 + 玻璃栈道', schedule: [
+                        {time: '08:00-09:00', activity: '前往天门山', transport: '自驾到天门山索道站', cost: '停车费30元'},
+                        {time: '09:00-09:30', activity: '乘世界最长索道上山', location: '天门山', tickets: '278元/人（含索道）', tips: '索道全长7.5公里，中国最长'},
+                        {time: '09:30-12:00', activity: '天门洞、玻璃栈道', tips: '走玻璃栈道需穿鞋套5元，天门洞999级台阶'},
+                        {time: '12:00-13:30', activity: '山顶午餐', cost: '约100元'},
+                        {time: '13:30-16:00', activity: '继续游览天门山', tips: '鬼谷栈道、天门山寺'},
+                        {time: '16:30-18:00', activity: '下山，晚餐', food: '三下锅', cost: '约120元'}
+                    ]},
+                    {day: 4, title: '大峡谷玻璃桥', schedule: [
+                        {time: '08:30-09:30', activity: '前往大峡谷', transport: '自驾约30公里', cost: '油费约30元'},
+                        {time: '10:00-12:00', activity: '张家界大峡谷玻璃桥', tickets: '259元/人', tips: '世界最长最高玻璃桥，需提前预约'},
+                        {time: '12:00-13:30', activity: '午餐', location: '景区附近', cost: '约100元'},
+                        {time: '14:00-17:00', activity: '大峡谷游览', tips: '峡谷内瀑布、溶洞景观'},
+                        {time: '18:00-20:00', activity: '返回市区，晚餐', food: '酸菜牛肉', cost: '约150元'}
+                    ]},
+                    {day: 5, title: '返程 - 黄龙洞', schedule: [
+                        {time: '09:00-11:30', activity: '黄龙洞（可选）', tickets: '100元', tips: '中国最美溶洞之一'},
+                        {time: '12:00-13:00', activity: '午餐 + 采购特产', tips: '葛根粉、猕猴桃干'},
+                        {time: '14:00-23:30', activity: '返回广州', cost: '油费约500元，过路费约275元', tips: '路程长，注意安全，中途休息'}
+                    ]}
+                ],
+
+                attractions: [
+                    {name: '张家界国家森林公园', intro: '世界自然遗产，阿凡达取景地', time: '1-2天', tickets: '228元（4天有效）', tips: '金鞭溪、袁家界、天子山必游'},
+                    {name: '天门山', intro: '天门洞、玻璃栈道、世界最长索道', time: '半天', tickets: '278元（含索道）', tips: '索道排队久，早去或买快速票'},
+                    {name: '大峡谷玻璃桥', intro: '世界最长最高玻璃桥', time: '半天', tickets: '259元', tips: '需提前预约，恐高慎入'},
+                    {name: '黄龙洞', intro: '中国最美溶洞', time: '2-3小时', tickets: '100元', tips: '钟乳石壮观，地下瀑布'},
+                    {name: '金鞭溪', intro: '森林公园徒步精华', time: '3-4小时', tickets: '含在门票内', tips: '负氧离子高，空气极好'}
+                ],
+
+                food: [
+                    {name: '三下锅', location: '溪布街、市区餐馆', price: '60-100元', recommend: '三下锅（腊肉、豆腐、萝卜）', tips: '张家界招牌菜，香辣'},
+                    {name: '土家腊肉', location: '土家菜馆', price: '50-80元', recommend: '腊肉炒蕨菜', tips: '土家特色，烟熏味'},
+                    {name: '岩耳炖鸡', location: '农家乐', price: '80-120元', recommend: '岩耳炖土鸡', tips: '岩耳是当地珍品'},
+                    {name: '酸菜牛肉', location: '土家餐厅', price: '60-90元', recommend: '酸菜炒牛肉', tips: '酸辣开胃'}
+                ],
+
+                budget: {
+                    transport: {fuel: 1000, toll: 550, parking: 110, total: 1660},
+                    accommodation: {hotel: '250-300元/晚', nights: 4, total: 1200},
+                    food: {breakfast: 20, lunch: 100, dinner: 150, total: 1350},
+                    tickets: {attractions: 1200, others: 300, total: 1500},
+                    shopping: 200,
+                    total: 5910,
+                    notes: '以上为2人预算，人均约2955元'
+                },
+
+                tips: [
+                    {title: '交通', content: '景点分散，建议自驾或包车，森林公园内有环保车'},
+                    {title: '住宿', content: '武陵源区离景区近，或住山顶客栈看日出'},
+                    {title: '最佳时间', content: '4-6月、9-11月，避开暑期人潮和冬季冰雪'},
+                    {title: '门票', content: '森林公园门票4天有效，玻璃桥需提前网上预约'},
+                    {title: '索道', content: '百龙天梯、天门山索道旺季排队久，早去或买快票'},
+                    {title: '体力', content: '多爬山，穿舒适鞋，带登山杖'}
+                ],
+
+                bestTime: '4-6月（春夏）、9-11月（秋季）',
+                weather: '亚热带山地气候，山上比市区冷5-10度',
+                specialNotes: '张家界是世界自然遗产，景色震撼。路程较远，建议预留充足时间'
+            },
+            '昆明': {
+                route: '广州 → 广昆高速 → 昆明（约1400公里，建议分2天驾驶，途经南宁休息）',
+                scenery: '途经广西、云南，从沿海到高原，风景多变，有喀斯特地貌、梯田、高原湖泊',
+                itinerary: [
+                    {
+                        day: 1,
+                        title: '广州出发 → 南宁（约570公里，7小时）',
+                        schedule: [
+                            {time: '07:00-14:00', activity: '广州出发，驾车前往南宁', location: '广昆高速', food: '服务区简餐（约60元/人）', cost: '约60元/人', tips: '早点出发，每2小时休息一次'},
+                            {time: '14:30-16:00', activity: '抵达南宁，酒店休息', location: '青秀区酒店', food: '', cost: '450元/晚', tips: '选择市中心酒店，方便晚上逛街'},
+                            {time: '18:00-20:00', activity: '中山路美食街晚餐', location: '中山路夜市', food: '老友粉、卷筒粉、芒果捞', cost: '约100元/人', tips: '南宁特色小吃街，必吃老友粉'},
+                            {time: '20:30-22:00', activity: '邕江夜景', location: '邕江滨江公园', food: '', cost: '0元', tips: '饭后散步消食'}
+                        ]
+                    },
+                    {
+                        day: 2,
+                        title: '南宁 → 昆明（约850公里，10小时） + 翠湖夜游',
+                        schedule: [
+                            {time: '06:30-17:00', activity: '南宁出发，长途驾驶前往昆明', location: '广昆高速', food: '服务区用餐（约150元/人）', cost: '约150元/人', tips: '最长驾驶日，建议两位司机轮换。注意海拔逐渐升高'},
+                            {time: '17:30-19:00', activity: '抵达昆明，酒店入住', location: '翠湖附近酒店', food: '', cost: '500元/晚', tips: '选择翠湖或南屏街附近，方便游玩'},
+                            {time: '19:30-21:00', activity: '南屏步行街晚餐', location: '南屏街', food: '过桥米线、汽锅鸡', cost: '约120元/人', tips: '桥香园米线最正宗'},
+                            {time: '21:30-22:30', activity: '翠湖公园夜游', location: '翠湖公园', food: '', cost: '免费', tips: '春城夜晚很凉爽，适合散步'}
+                        ]
+                    },
+                    {
+                        day: 3,
+                        title: '石林一日游',
+                        schedule: [
+                            {time: '07:30-09:30', activity: '驾车前往石林', location: '石林县（距昆明85公里）', food: '酒店早餐', cost: '含在房费', tips: '石林景区很大，需要一整天时间'},
+                            {time: '09:30-13:00', activity: '石林大景区游览', location: '石林风景区', food: '景区简餐', cost: '门票130元', tips: '喀斯特地貌奇观，天下第一奇观。建议请导游讲解'},
+                            {time: '13:30-14:30', activity: '彝族特色午餐', location: '石林县城', food: '彝族烤肉、乳饼', cost: '约100元/人', tips: '品尝彝族特色美食'},
+                            {time: '15:00-17:00', activity: '石林小景区、乃古石林', location: '乃古石林（可选）', food: '', cost: '含在门票内', tips: '体力允许可继续游览，否则可返程'},
+                            {time: '18:00-19:30', activity: '返回昆明市区', location: '返程路上', food: '', cost: '', tips: '傍晚返程，避开白天高温'},
+                            {time: '20:00-21:30', activity: '昆明特色晚餐', location: '市区', food: '野生菌火锅', cost: '约150元/人', tips: '6-9月野生菌季节，必吃！其他季节吃干菌'}
+                        ]
+                    },
+                    {
+                        day: 4,
+                        title: '滇池 + 西山龙门 + 官渡古镇',
+                        schedule: [
+                            {time: '08:30-09:30', activity: '驾车前往滇池西山', location: '西山风景区', food: '', cost: '门票40元+龙门索道70元', tips: '昆明必游景点，俯瞰滇池全景'},
+                            {time: '09:30-12:00', activity: '西山龙门登高', location: '龙门石窟', food: '', cost: '', tips: '悬崖峭壁上的道教石窟，景观壮观'},
+                            {time: '12:30-14:00', activity: '海埂大坝午餐', location: '滇池海埂公园', food: '湖景餐厅', cost: '约100元/人', tips: '边用餐边欣赏滇池美景'},
+                            {time: '14:30-16:30', activity: '海埂公园喂海鸥', location: '海埂大坝', food: '面包喂海鸥', cost: '面包10元', tips: '11月-次年3月有红嘴鸥，其他季节可略过'},
+                            {time: '17:00-19:00', activity: '官渡古镇游览', location: '官渡古镇', food: '官渡粑粑', cost: '免费入园', tips: '昆明老街区，品尝特色小吃'},
+                            {time: '19:30-21:00', activity: '古镇晚餐', location: '官渡古镇', food: '云南小吃', cost: '约80元/人', tips: '小锅米线、烧饵块、豆花米线'}
+                        ]
+                    },
+                    {
+                        day: 5,
+                        title: '云南民族村 + 返程准备',
+                        schedule: [
+                            {time: '09:00-12:00', activity: '云南民族村游览', location: '云南民族村', food: '', cost: '门票90元', tips: '了解云南26个民族文化，有民族表演'},
+                            {time: '12:30-14:00', activity: '民族特色午餐', location: '民族村内或附近', food: '傣味、白族菜', cost: '约100元/人', tips: '体验多民族美食'},
+                            {time: '14:30-16:30', activity: '翠湖公园 + 云南陆军讲武堂', location: '翠湖公园', food: '', cost: '免费', tips: '昆明市中心景点，讲武堂是近代军事名校'},
+                            {time: '17:00-18:00', activity: '采购特产', location: '南屏街', food: '', cost: '特产约300元', tips: '鲜花饼、普洱茶、云南白药、野生菌'},
+                            {time: '18:30-20:00', activity: '告别晚餐', location: '市区', food: '云南汽锅鸡', cost: '约130元/人', tips: '最后一顿，品尝云南名菜'},
+                            {time: '20:30', activity: '收拾行李，准备返程', location: '酒店', food: '', cost: '', tips: '次日可开始返程，或继续前往大理、丽江'}
+                        ]
+                    }
+                ],
+                attractions: [
+                    {name: '石林风景区', intro: '世界自然遗产，喀斯特地貌奇观，被誉为"天下第一奇观"，形态各异的石峰石柱', time: '建议4-5小时', tickets: '130元（含大小石林）', tips: '景区很大，建议乘电瓶车。请导游讲解更有收获'},
+                    {name: '滇池', intro: '云南最大淡水湖，昆明母亲湖，西山龙门俯瞰滇池全景。冬季有红嘴鸥', time: '建议半天', tickets: '免费（西山40元）', tips: '11月-次年3月看海鸥最佳。海埂大坝是观景点'},
+                    {name: '西山龙门', intro: '昆明西山之巅，道教石窟群，开凿于悬崖峭壁，可俯瞰滇池全景', time: '建议2-3小时', tickets: '40元+索道70元', tips: '建议坐索道上山，步行下山。登高望远，景观壮观'},
+                    {name: '翠湖公园', intro: '昆明市中心公园，春城绿肺，冬季有红嘴鸥。毗邻云南陆军讲武堂', time: '建议1-2小时', tickets: '免费', tips: '冬季看海鸥。周边有讲武堂、云南大学可一起游览'},
+                    {name: '云南民族村', intro: '集云南26个民族文化于一体的民族文化博览园，有民族表演和建筑', time: '建议2-3小时', tickets: '90元', tips: '可了解云南多民族文化。有定时表演，查好时间'}
+                ],
+                food: [
+                    {name: '过桥米线', location: '桥香园、建新园', price: '约50-80元/人', recommend: '云南名吃，鲜美汤底，多种配菜', tips: '桥香园是老字号，建新园也很正宗'},
+                    {name: '汽锅鸡', location: '各大滇菜馆', price: '约130元/人', recommend: '云南名菜，鸡肉鲜嫩，原汁原味', tips: '需要时间慢炖，建议提前预订'},
+                    {name: '野生菌火锅', location: '木水花、菌子王', price: '约150元/人', recommend: '6-9月野生菌季节必吃，多种菌类', tips: '注意辨别菌类，不认识的不要吃。其他季节吃干菌'},
+                    {name: '鲜花饼', location: '嘉华饼屋', price: '约20元/盒', recommend: '昆明特产，玫瑰花馅，现烤最佳', tips: '嘉华是最有名品牌，机场也有售'},
+                    {name: '烧饵块', location: '街边小摊、官渡古镇', price: '约10元/份', recommend: '云南特色早餐，米制品，配多种酱料', tips: '配油条、酱料，口味独特'}
+                ],
+                budget: {
+                    transport: {
+                        fuel: 1600,
+                        toll: 900,
+                        parking: 100,
+                        total: 2600
+                    },
+                    accommodation: {
+                        hotel: '南宁酒店450元+昆明酒店500元×3晚=1950元',
+                        nights: 4,
+                        total: 1950
+                    },
+                    food: {
+                        breakfast: 200,
+                        lunch: 670,
+                        dinner: 750,
+                        total: 1620
+                    },
+                    tickets: {
+                        attractions: 530,
+                        others: 150,
+                        total: 680
+                    },
+                    total: 6850
+                },
+                tips: [
+                    {title: '⏰ 最佳时间', content: '昆明四季如春，全年适宜。11月-次年3月可看海鸥'},
+                    {title: '🚗 自驾建议', content: '路程远（1400公里），必须分2天驾驶。南宁中转休息一晚'},
+                    {title: '⛰️ 高原适应', content: '昆明海拔1890米，一般不会高反，但仍需注意休息'},
+                    {title: '🌡️ 穿衣指南', content: '早晚温差大，需准备外套。紫外线强，注意防晒'},
+                    {title: '🍄 野生菌季', content: '6-9月野生菌季，必吃野生菌火锅。注意食品安全'},
+                    {title: '🦜 海鸥季节', content: '11月-次年3月红嘴鸥飞来过冬。海埂大坝、翠湖可喂海鸥'},
+                    {title: '🎫 景点推荐', content: '石林必去（世界遗产）。滇池+西山龙门可半天。民族村适合亲子'},
+                    {title: '🛍️ 特产推荐', content: '鲜花饼（嘉华）、普洱茶、野生菌干货、云南白药'},
+                    {title: '🍜 美食街区', content: '南屏街：米线、汽锅鸡；官渡古镇：小吃；翠湖周边：老字号'},
+                    {title: '🚨 注意事项', content: '紫外线很强，防晒必备。昆明作为中转站可前往大理、丽江'}
+                ],
+                bestTime: '全年适宜（四季如春），11-3月可看海鸥',
+                weather: '亚热带高原季风气候，四季如春，紫外线强',
+                specialNotes: '距离远，建议分2天驾驶。昆明是云南中转站，可继续前往大理、丽江等地'
+            },
+            '三亚': {
+                route: '广州 → 海安港（轮渡）→ 海口 → 东线高速 → 三亚（约500公里+轮渡3小时，总计10-11小时）',
+                scenery: '轮渡跨越琼州海峡观海景，到海南后沿东线高速，椰林海滩、热带风光',
+
+                itinerary: [
+                    {
+                        day: 1,
+                        title: '广州出发 → 海口轮渡 → 三亚',
+                        schedule: [
+                            { time: '07:00-11:00', activity: '广州出发，驾车前往海安港', transport: '自驾约400公里', cost: '油费约350元，过路费约150元', tips: '提前订轮渡票，避开节假日高峰' },
+                            { time: '11:30-14:30', activity: '海安港乘轮渡过海', location: '海安港→海口新海港', tickets: '车+2人约800元', tips: '轮渡约3小时，可以上甲板看海景，提前1天订票' },
+                            { time: '15:00-18:00', activity: '海口下船，驾车前往三亚', transport: '东线高速约250公里', cost: '油费约150元，过路费约100元', tips: '沿途椰林海岸，风景美' },
+                            { time: '18:00-19:00', activity: '抵达三亚，酒店入住', location: '三亚湾或大东海酒店', tips: '建议住海边酒店，海景房体验好' },
+                            { time: '19:30-21:30', activity: '晚餐 + 三亚湾散步', location: '三亚湾', food: '海鲜大排档、清补凉', cost: '约300元', tips: '三亚湾看日落很美' }
+                        ]
+                    },
+                    {
+                        day: 2,
+                        title: '蜈支洲岛一日游',
+                        schedule: [
+                            { time: '07:30-08:30', activity: '前往蜈支洲岛码头', transport: '自驾约30公里', cost: '停车费50元', tips: '早去人少，下午风浪大船会停运' },
+                            { time: '09:00-09:30', activity: '乘船登岛', location: '蜈支洲岛', tickets: '船票+门票约150元', tips: '中国的马尔代夫，水质超清' },
+                            { time: '09:30-12:00', activity: '岛上游玩：观日岩、情人桥、妈祖庙', tips: '可以玩潜水、摩托艇等水上项目（另收费）' },
+                            { time: '12:00-13:30', activity: '岛上午餐', food: '海鲜自助或快餐', cost: '约200元', tips: '岛上餐饮较贵，可以自带零食' },
+                            { time: '13:30-16:00', activity: '继续游玩或水上项目', tips: '潜水约300-500元，摩托艇200元起' },
+                            { time: '16:30-17:30', activity: '乘船返回，驾车回酒店', transport: '返回三亚湾' },
+                            { time: '19:00-21:00', activity: '第一市场海鲜加工', location: '第一市场', food: '自己买海鲜找加工店', cost: '约400元', tips: '比酒店便宜很多，记得讲价' }
+                        ]
+                    },
+                    {
+                        day: 3,
+                        title: '亚龙湾 + 天堂森林公园',
+                        schedule: [
+                            { time: '08:30-09:30', activity: '前往亚龙湾', transport: '自驾约30公里', tips: '亚龙湾是三亚最美海湾' },
+                            { time: '09:30-12:00', activity: '亚龙湾沙滩、海滨浴场', location: '亚龙湾', tickets: '免费', tips: '可以游泳、玩沙滩，水质清澈，沙滩细软' },
+                            { time: '12:00-13:30', activity: '午餐', location: '亚龙湾', food: '海鲜餐厅或酒店', cost: '约250元' },
+                            { time: '14:00-17:30', activity: '亚龙湾热带天堂森林公园', location: '森林公园', tickets: '约175元', tips: '《非诚勿扰2》拍摄地，玻璃栈桥、鸟巢、过江龙索桥' },
+                            { time: '18:00-20:00', activity: '返回市区，晚餐', location: '大东海', food: '椰子鸡、海南菜', cost: '约250元' },
+                            { time: '20:30-22:00', activity: '大东海夜景、海边散步' }
+                        ]
+                    },
+                    {
+                        day: 4,
+                        title: '南山文化旅游区 + 天涯海角',
+                        schedule: [
+                            { time: '08:00-09:00', activity: '前往南山寺', transport: '自驾约50公里', cost: '油费约40元' },
+                            { time: '09:00-12:00', activity: '南山寺、108米海上观音', location: '南山文化旅游区', tickets: '约129元', tips: '中国最南端佛教圣地，海上观音很震撼' },
+                            { time: '12:00-13:30', activity: '南山素斋午餐', location: '南山寺', food: '素斋自助', cost: '约100元/人', tips: '南山素斋很有名，值得一试' },
+                            { time: '14:30-17:00', activity: '天涯海角', location: '天涯海角景区', tickets: '约81元', tips: '打卡天涯石、海角石，拍照留念' },
+                            { time: '17:30-19:00', activity: '返回市区，晚餐', food: '海南四大名菜', cost: '约280元' },
+                            { time: '20:00-22:00', activity: '三亚千古情演出（可选）', location: '三亚千古情景区', tickets: '约280-380元', tips: '大型歌舞秀，很震撼' }
+                        ]
+                    },
+                    {
+                        day: 5,
+                        title: '返程日 - 海棠湾免税店 + 返回广州',
+                        schedule: [
+                            { time: '09:00-12:00', activity: '海棠湾免税店购物', location: '海棠湾免税店', tips: '全球最大免税店，化妆品、奢侈品很便宜，记得带护照' },
+                            { time: '12:00-13:30', activity: '午餐', location: '免税店', food: '各类餐厅', cost: '约200元' },
+                            { time: '14:00-17:00', activity: '驾车前往海口', transport: '东线高速', cost: '油费约150元，过路费约100元' },
+                            { time: '17:30-20:30', activity: '海口乘轮渡返回', tickets: '车+2人约800元' },
+                            { time: '21:00-24:00', activity: '驾车返回广州', transport: '自驾约400公里', cost: '油费约350元，过路费约150元' },
+                            { time: '24:00', activity: '抵达广州，旅程结束', tips: '也可在海口住一晚，第二天返回' }
+                        ]
+                    }
+                ],
+
+                attractions: [
+                    { name: '蜈支洲岛', intro: '中国马尔代夫，水质清澈，适合潜水', time: '建议游玩半天到全天', tickets: '船票+门票150元', tips: '早上去人少，下午风浪大可能停航，潜水300-500元' },
+                    { name: '亚龙湾', intro: '三亚最美海湾，天下第一湾', time: '半天', tickets: '沙滩免费', tips: '水质清，沙滩细，适合游泳，周边酒店高端' },
+                    { name: '天堂森林公园', intro: '《非诚勿扰2》拍摄地，热带雨林', time: '3-4小时', tickets: '175元', tips: '玻璃栈桥、鸟巢度假村、过江龙索桥，俯瞰亚龙湾' },
+                    { name: '南山寺', intro: '海上108米观音像，佛教圣地', time: '3-4小时', tickets: '129元', tips: '南山素斋有名，观音像很震撼' },
+                    { name: '天涯海角', intro: '天涯石、海角石，网红打卡地', time: '2小时', tickets: '81元', tips: '拍照打卡为主，海滩一般' },
+                    { name: '免税店', intro: '全球最大免税店，购物天堂', time: '2-3小时', tickets: '免费进入', tips: '化妆品、奢侈品便宜，需护照' }
+                ],
+
+                food: [
+                    { name: '海鲜加工', location: '第一市场、火车头万人海鲜广场', price: '人均150-300元', recommend: '濑尿虾、和乐蟹、龙虾、石斑鱼', tips: '自己买海鲜找加工店，比酒店便宜一半，记得讲价' },
+                    { name: '椰子鸡', location: '润园四季椰子鸡、文昌邓记', price: '人均80-120元', recommend: '椰子鸡、椰子饭、椰子冻', tips: '清甜养生，椰子水煮鸡很鲜' },
+                    { name: '海南四大名菜', location: '琼菜王、海南人家', price: '人均100-150元', recommend: '文昌鸡、加积鸭、东山羊、和乐蟹', tips: '海南特色菜，值得一试' },
+                    { name: '清补凉', location: '正宗海南清补凉、三亚第一市场', price: '10-20元/碗', recommend: '椰奶清补凉、红豆清补凉', tips: '海南糖水甜品，消暑解渴' },
+                    { name: '热带水果', location: '第一市场、各水果店', price: '时价', recommend: '芒果、山竹、莲雾、榴莲、椰子', tips: '便宜又新鲜，可以大量买' }
+                ],
+
+                budget: {
+                    transport: { fuel: 700, toll: 300, ferry: 1600, parking: 100, total: 2700 },
+                    accommodation: { hotel: '400-600元/晚', nights: 4, total: 2000 },
+                    food: { breakfast: 40, lunch: 200, dinner: 300, total: 2700 },
+                    tickets: { attractions: 900, others: 300, total: 1200 },
+                    shopping: 1000,
+                    total: 9600,
+                    notes: '以上为2人预算，人均约4800元'
+                },
+
+                tips: [
+                    { title: '轮渡', content: '海安港到海口轮渡需提前1天订票，节假日更早，单程约3小时' },
+                    { title: '住宿', content: '建议住三亚湾或大东海，性价比高；亚龙湾酒店贵但体验好' },
+                    { title: '最佳时间', content: '11月-次年4月最佳，避开台风季和酷暑' },
+                    { title: '海鲜', content: '第一市场自己买海鲜加工最便宜，记得讲价，问清加工费' },
+                    { title: '防晒', content: '紫外线强，一定做好防晒，带防晒霜SPF50+、晒后修复' },
+                    { title: '免税店', content: '需护照，提前3天网上预约，现场提货' }
+                ],
+
+                bestTime: '11月-次年4月（避开台风和酷暑）',
+                weather: '热带季风气候，全年高温，5-10月雨季有台风',
+                specialNotes: '三亚是度假天堂，但物价较高。轮渡过海需提前订票。建议5天4夜或更长时间，慢节奏度假'
+            },
+            '惠州': {
+                route: '广州 → 广惠高速 → 惠州（约120公里，1.5小时）',
+                scenery: '沿途珠三角城市群风光，接近惠州后山地增多',
+                attractions: ['惠州西湖', '罗浮山', '双月湾', '巽寮湾', '惠州古城'],
+                food: ['东江菜', '梅菜扣肉', '客家盐焗鸡', '海鲜', '惠州梅菜'],
+                budget: {
+                    fuel: 180,
+                    toll: 100,
+                    accommodation: 800,
+                    food: 1200,
+                    tickets: 500,
+                    total: 2780
+                }
+            },
+            '清远': {
+                route: '广州 → 广清高速 → 清远（约70公里，1小时）',
+                scenery: '沿途珠三角向山区过渡，喀斯特地貌开始出现',
+                attractions: ['连州地下河', '英德峰林', '古龙峡', '黄腾峡漂流', '宝晶宫'],
+                food: ['清远鸡', '乌鬃鹅', '骆坑笋', '洲心大粥', '刀切糍'],
+                budget: {
+                    fuel: 150,
+                    toll: 80,
+                    accommodation: 700,
+                    food: 1000,
+                    tickets: 600,
+                    total: 2530
+                }
+            },
+            '韶关': {
+                route: '广州 → 京港澳高速 → 韶关（约220公里，2.5小时）',
+                scenery: '途经从化、佛冈，渐入粤北山区，丹霞地貌壮观',
+                attractions: ['丹霞山', '南华寺', '乳源大峡谷', '南岭国家森林公园', '珠玑巷'],
+                food: ['爆炒山坑螺', '铜勺饼', '南雄鹅王', '长坝沙田柚', '始兴石人嶂茶'],
+                budget: {
+                    fuel: 300,
+                    toll: 150,
+                    accommodation: 700,
+                    food: 1000,
+                    tickets: 500,
+                    total: 2650
+                }
+            },
+            '北海': {
+                route: '广州 → 广佛肇高速 → 广昆高速 → 北海（约550公里，6.5小时）',
+                scenery: '途经广东、广西，从珠三角到北部湾沿海，风光变化丰富',
+                itinerary: [
+                    {
+                        day: 1,
+                        title: '广州出发 → 北海银滩',
+                        schedule: [
+                            {time: '07:00-13:30', activity: '广州出发，驾车前往北海', location: '广昆高速', food: '服务区简餐（约60元/人）', cost: '约60元/人', tips: '提前检查车况，早出发避开周末高峰'},
+                            {time: '14:00-15:30', activity: '抵达北海，酒店入住', location: '银滩附近酒店', food: '', cost: '500元/晚', tips: '选择银滩附近酒店，步行可达海滩'},
+                            {time: '16:00-18:30', activity: '银滩漫步，赶海戏水', location: '北海银滩', food: '海滩小吃', cost: '免费入园', tips: '中国第一滩，沙质细腻。下午光线适合拍照'},
+                            {time: '19:00-20:30', activity: '侨港风情街海鲜大餐', location: '侨港镇', food: '越南卷粉、糖水、海鲜烧烤', cost: '约150元/人', tips: '侨港是越南归侨聚集地，美食地道便宜'},
+                            {time: '21:00-22:00', activity: '银滩夜景散步', location: '银滩', food: '', cost: '0元', tips: '晚上的银滩很安静，适合散步'}
+                        ]
+                    },
+                    {
+                        day: 2,
+                        title: '涠洲岛一日游',
+                        schedule: [
+                            {time: '06:30-07:30', activity: '前往国际客运港', location: '北海国际客运港', food: '提前准备早餐', cost: '停车费30元/天', tips: '提前网上购票，旺季票紧张'},
+                            {time: '08:30-09:30', activity: '乘坐快船前往涠洲岛', location: '涠洲岛', food: '', cost: '往返船票240元+上岛费115元', tips: '建议坐快船，1小时到达。易晕船提前吃药'},
+                            {time: '10:00-12:00', activity: '鳄鱼山火山公园', location: '鳄鱼山景区', food: '', cost: '含在上岛费内', tips: '中国最年轻的火山岛，地质奇观'},
+                            {time: '12:30-13:30', activity: '岛上海鲜午餐', location: '南湾街', food: '石斑鱼、濑尿虾、扇贝', cost: '约180元/人', tips: '海鲜现挑现做，价格比北海市区贵些'},
+                            {time: '14:00-16:00', activity: '五彩滩 + 贝壳沙滩', location: '五彩滩、贝壳沙滩', food: '', cost: '含在上岛费内', tips: '退潮时五彩滩最美，可看到火山岩'},
+                            {time: '16:30-17:30', activity: '天主教堂', location: '盛塘天主教堂', food: '', cost: '免费', tips: '百年法式教堂，很有特色'},
+                            {time: '18:00-19:00', activity: '乘船返回北海', location: '涠洲岛码头', food: '', cost: '', tips: '不要错过末班船（一般18:30）'},
+                            {time: '19:30-21:00', activity: '北海老街晚餐', location: '北海老街', food: '虾饼、猪脚粉、沙虫', cost: '约100元/人', tips: '百年骑楼老街，夜晚更有韵味'}
+                        ]
+                    },
+                    {
+                        day: 3,
+                        title: '北海老街 + 红树林',
+                        schedule: [
+                            {time: '08:30-10:00', activity: '北海老街深度游', location: '珠海路老街', food: '老街早茶、虾饼', cost: '约40元/人', tips: '清晨的老街更安静，适合拍照'},
+                            {time: '10:30-12:00', activity: '北部湾广场、海洋之窗', location: '北部湾广场', food: '', cost: '海洋之窗138元（可选）', tips: '海洋之窗适合亲子，可根据兴趣选择'},
+                            {time: '12:30-14:00', activity: '海鲜市场午餐', location: '外沙海鲜岛', food: '自选海鲜加工', cost: '约150元/人', tips: '海鲜市场买海鲜，餐厅加工，实惠'},
+                            {time: '14:30-17:00', activity: '金海湾红树林', location: '金海湾红树林景区', location: '金海湾', food: '', cost: '门票105元', tips: '乘坐疍家船穿梭红树林，生态美景'},
+                            {time: '17:30-19:00', activity: '冠头岭看日落', location: '冠头岭国家森林公园', food: '', cost: '免费', tips: '北海最佳日落观赏点'},
+                            {time: '19:30-21:00', activity: '侨港糖水街', location: '侨港糖水街', food: '各式糖水、炒螺', cost: '约60元/人', tips: '24号糖水铺最有名'}
+                        ]
+                    },
+                    {
+                        day: 4,
+                        title: '北海市区 + 海滩休闲',
+                        schedule: [
+                            {time: '09:00-11:00', activity: '银滩再次戏水、游泳', location: '银滩', food: '', cost: '0元', tips: '上午阳光不太强，适合下海'},
+                            {time: '11:30-13:00', activity: '海鲜午餐', location: '银滩附近', food: '海鲜炒粉、炒螺', cost: '约100元/人', tips: '海滩附近餐厅价格稍贵'},
+                            {time: '14:00-16:00', activity: '酒店休息或购买特产', location: '北海市区', food: '', cost: '特产约200元', tips: '购买海产干货：鱿鱼丝、虾米、沙虫干'},
+                            {time: '16:30-18:00', activity: '海滩公园散步', location: '银滩公园', food: '椰子、冰淇淋', cost: '约30元/人', tips: '傍晚海风凉爽，很舒适'},
+                            {time: '18:30-20:00', activity: '告别晚餐', location: '老街或侨港', food: '最后品尝喜欢的美食', cost: '约120元/人', tips: '推荐再去侨港吃越南菜'},
+                            {time: '20:30', activity: '收拾行李，准备返程', location: '酒店', food: '', cost: '', tips: '第二天可早起返回广州'}
+                        ]
+                    },
+                    {
+                        day: 5,
+                        title: '返程日',
+                        schedule: [
+                            {time: '08:00-09:00', activity: '酒店早餐，退房', location: '酒店', food: '酒店自助早餐', cost: '含在房费', tips: '检查有无遗漏物品'},
+                            {time: '09:30-16:00', activity: '北海返回广州', location: '广昆高速', food: '服务区午餐（约80元/人）', cost: '约80元/人', tips: '注意安全驾驶，疲劳时及时休息'},
+                            {time: '16:30', activity: '抵达广州，旅程结束', location: '广州', food: '', cost: '', tips: '返程后好好休息'}
+                        ]
+                    }
+                ],
+                attractions: [
+                    {name: '银滩', intro: '中国第一滩，沙质细腻洁白，沙滩宽阔平缓，海水清澈，是北海标志性景点', time: '建议半天', tickets: '免费', tips: '下午3-5点光线最佳，适合拍照。注意防晒'},
+                    {name: '涠洲岛', intro: '中国最大最年轻的火山岛，鳄鱼山、五彩滩、天主教堂等景点丰富', time: '建议1整天', tickets: '往返船票240元+上岛费115元', tips: '提前网上购票。易晕船备好药。旺季住岛上需提前订房'},
+                    {name: '北海老街', intro: '珠海路百年骑楼老街，中西合璧建筑，是北海近代历史的缩影', time: '建议1-2小时', tickets: '免费', tips: '清晨和夜晚各有特色，可安排两次游览'},
+                    {name: '金海湾红树林', intro: '中国滨海湿地风情和渔家文化的完美结合，可乘船穿梭红树林', time: '建议2-3小时', tickets: '105元（含游船）', tips: '涨潮时乘船观赏效果最佳'},
+                    {name: '侨港风情街', intro: '越南归侨聚集地，地道的越南美食一条街，价格实惠', time: '建议晚餐时间', tickets: '免费', tips: '糖水街24号糖水铺最有名。晚上7-9点最热闹'}
+                ],
+                food: [
+                    {name: '侨港越南卷粉', location: '侨港镇', price: '约10元/份', recommend: '侨港特色，米皮卷虾肉，配特制酱料', tips: '侨港糖水街很多店都有'},
+                    {name: '北海海鲜', location: '外沙海鲜岛、侨港', price: '约150-200元/人', recommend: '濑尿虾、花蟹、石斑鱼、扇贝', tips: '外沙海鲜岛买海鲜找餐厅加工更实惠'},
+                    {name: '虾饼', location: '北海老街', price: '约15元/个', recommend: '北海传统小吃，鲜虾油炸，香酥可口', tips: '老街李姨虾饼店最有名'},
+                    {name: '猪脚粉', location: '各处早餐店', price: '约15-20元/碗', recommend: '北海特色粉类，猪脚软烂入味', tips: '侨港有很多正宗店铺'},
+                    {name: '糖水', location: '侨港糖水街', price: '约8-15元/碗', recommend: '椰汁西米露、清补凉、芒果捞等', tips: '24号糖水铺、芋头糖水铺都不错'}
+                ],
+                budget: {
+                    transport: {
+                        fuel: 650,
+                        toll: 350,
+                        parking: 50,
+                        total: 1050
+                    },
+                    accommodation: {
+                        hotel: '银滩附近酒店500元×4晚',
+                        nights: 4,
+                        total: 2000
+                    },
+                    food: {
+                        breakfast: 160,
+                        lunch: 710,
+                        dinner: 650,
+                        total: 1520
+                    },
+                    tickets: {
+                        attractions: 740,
+                        others: 100,
+                        total: 840
+                    },
+                    total: 5410
+                },
+                tips: [
+                    {title: '⏰ 最佳时间', content: '4-11月最佳，夏季可下海，冬季温暖避寒'},
+                    {title: '🚗 自驾建议', content: '路程适中（550公里），单日可达。停车方便，费用不高'},
+                    {title: '🏝️ 涠洲岛', content: '船票旺季紧张，提前3-7天网上订票。易晕船提前吃药'},
+                    {title: '🏖️ 银滩游玩', content: '沙滩免费，但冲淡水10元/次。贵重物品勿带下海'},
+                    {title: '🦐 海鲜攻略', content: '外沙海鲜岛买海鲜找餐厅加工最实惠。侨港海鲜大排档价格公道'},
+                    {title: '☀️ 防晒必备', content: '海边紫外线强，防晒霜SPF50+必备，每2小时补涂'},
+                    {title: '🍧 美食街区', content: '侨港风情街：越南美食+糖水；老街：虾饼+猪脚粉；外沙：海鲜加工'},
+                    {title: '🏨 住宿建议', content: '银滩附近酒店方便游玩。侨港附近性价比高且美食多'},
+                    {title: '📸 拍照时机', content: '银滩下午3-5点光线最佳。涠洲岛五彩滩需退潮时'},
+                    {title: '🚨 注意事项', content: '涠洲岛末班船一般18:30，不要错过。海鲜注意新鲜度和价格'}
+                ],
+                bestTime: '4-11月（夏季可下海，冬季避寒）',
+                weather: '亚热带海洋季风气候，夏季炎热多雨，冬季温暖干燥',
+                specialNotes: '距离适中，适合5天行程。涠洲岛船票需提前订。海鲜选择多，注意货比三家'
+            },
+            '南宁': {
+                route: '广州 → 广昆高速 → 南宁（约580公里，6.5小时）',
+                scenery: '途经梧州、贵港，从珠三角到广西首府，喀斯特地貌和亚热带风光',
+                attractions: ['青秀山', '南湖公园', '广西民族博物馆', '大明山', '扬美古镇'],
+                food: ['老友粉', '螺蛳粉', '柠檬鸭', '生榨米粉', '卷筒粉'],
+                budget: {
+                    fuel: 700,
+                    toll: 370,
+                    accommodation: 800,
+                    food: 1200,
+                    tickets: 400,
+                    total: 3470
+                }
+            },
+            '贵阳': {
+                route: '广州 → 广昆高速 → 贵阳（约950公里，11小时，建议中途在柳州或都匀休息）',
+                scenery: '途经广西、贵州，喀斯特地貌精华段，山峦叠嶂，瀑布溶洞众多',
+                attractions: ['黄果树瀑布', '青岩古镇', '花溪公园', '甲秀楼', '天河潭'],
+                food: ['酸汤鱼', '丝娃娃', '肠旺面', '豆腐圆子', '牛肉粉'],
+                budget: {
+                    fuel: 1100,
+                    toll: 600,
+                    accommodation: 1000,
+                    food: 1300,
+                    tickets: 800,
+                    total: 4800
+                }
+            },
+            '福州': {
+                route: '广州 → 沈海高速 → 福州（约800公里，9小时）',
+                scenery: '途经潮汕、闽南沿海，海岸线风光秀美',
+                attractions: ['三坊七巷', '鼓山', '西湖公园', '福建博物院', '平潭岛'],
+                food: ['佛跳墙', '鱼丸', '肉燕', '荔枝肉', '福州线面'],
+                budget: {
+                    fuel: 950,
+                    toll: 520,
+                    accommodation: 1000,
+                    food: 1400,
+                    tickets: 500,
+                    total: 4370
+                }
+            },
+            '南昌': {
+                route: '广州 → 京港澳高速 → 大广高速 → 南昌（约750公里，8.5小时）',
+                scenery: '途经韶关、赣州，从粤北山区到江西鄱阳湖平原',
+                attractions: ['滕王阁', '八一广场', '绳金塔', '秋水广场', '鄱阳湖'],
+                food: ['瓦罐汤', '南昌拌粉', '白糖糕', '鄱阳湖鱼', '藜蒿炒腊肉'],
+                budget: {
+                    fuel: 900,
+                    toll: 480,
+                    accommodation: 800,
+                    food: 1200,
+                    tickets: 500,
+                    total: 3880
+                }
+            },
+            '梅州': {
+                route: '广州 → 广河高速 → 梅州（约380公里，4.5小时）',
+                scenery: '途经河源、东江流域，粤东北山区客家风情',
+                attractions: ['客天下', '雁南飞茶田', '客家博物馆', '千佛塔', '阴那山'],
+                food: ['客家酿豆腐', '盐焗鸡', '梅菜扣肉', '艾粄', '腌面'],
+                budget: {
+                    fuel: 450,
+                    toll: 240,
+                    accommodation: 600,
+                    food: 1000,
+                    tickets: 400,
+                    total: 2690
+                }
+            },
+            '潮州': {
+                route: '广州 → 广惠高速 → 潮惠高速 → 潮州（约450公里，5小时）',
+                scenery: '途经惠州、汕头，潮汕平原风光，韩江水系',
+                attractions: ['广济桥', '牌坊街', '开元寺', '韩文公祠', '潮州古城'],
+                food: ['潮州牛肉丸', '卤鹅', '肠粉', '蚝烙', '甘草水果', '工夫茶'],
+                budget: {
+                    fuel: 550,
+                    toll: 280,
+                    accommodation: 700,
+                    food: 1200,
+                    tickets: 300,
+                    total: 3030
+                }
+            },
+            '汕头': {
+                route: '广州 → 广惠高速 → 潮惠高速 → 汕头（约420公里，4.8小时）',
+                scenery: '途经惠州、潮汕平原，沿海风光',
+                attractions: ['南澳岛', '小公园骑楼', '礐石风景区', '汕头海滨长廊', '妈屿岛'],
+                food: ['牛肉火锅', '肠粉', '蚝烙', '粿条', '鱼饺', '炒糕粿'],
+                budget: {
+                    fuel: 520,
+                    toll: 270,
+                    accommodation: 800,
+                    food: 1300,
+                    tickets: 400,
+                    total: 3290
+                }
+            },
+            '泉州': {
+                route: '广州 → 沈海高速 → 泉州（约700公里，7.5小时）',
+                scenery: '途经潮汕、闽南沿海，海上丝绸之路起点风光',
+                attractions: ['清源山', '开元寺', '西街', '洛阳桥', '崇武古城', '清净寺'],
+                food: ['面线糊', '肉粽', '姜母鸭', '土笋冻', '醋肉', '海蛎煎'],
+                budget: {
+                    fuel: 850,
+                    toll: 460,
+                    accommodation: 900,
+                    food: 1300,
+                    tickets: 400,
+                    total: 3910
+                }
+            },
+            '漳州': {
+                route: '广州 → 沈海高速 → 漳州（约680公里，7.3小时）',
+                scenery: '途经潮汕、闽南，沿海田园风光',
+                attractions: ['南靖土楼', '云水谣', '东山岛', '火山岛', '漳州古城'],
+                food: ['卤面', '手抓面', '猫仔粥', '蚝仔煎', '五香卷'],
+                budget: {
+                    fuel: 820,
+                    toll: 440,
+                    accommodation: 800,
+                    food: 1200,
+                    tickets: 500,
+                    total: 3760
+                }
+            },
+            '武夷山': {
+                route: '广州 → 长深高速 → 京台高速 → 武夷山（约900公里，10小时，建议中途休息）',
+                scenery: '途经江西、福建山区，武夷山脉风光秀丽',
+                itinerary: [
+                    {
+                        day: 1,
+                        title: '广州出发 → 武夷山（约900公里，10小时）',
+                        schedule: [
+                            {time: '06:30-17:00', activity: '广州出发，长途驾驶前往武夷山', location: '长深高速→京台高速', food: '服务区用餐（约120元/人）', cost: '约120元/人', tips: '全天驾驶，建议两位司机轮换。福建山路多，注意安全'},
+                            {time: '17:30-18:30', activity: '抵达武夷山，酒店入住', location: '武夷山度假区酒店', food: '', cost: '500元/晚', tips: '选择度假区酒店，靠近景区入口'},
+                            {time: '19:00-20:30', activity: '武夷山特色晚餐', location: '度假区餐厅', food: '岚谷熏鹅、瘦肉羹', cost: '约120元/人', tips: '品尝当地特色美食'},
+                            {time: '21:00-22:00', activity: '印象大红袍演出（可选）', location: '印象大红袍剧场', food: '', cost: '演出票218元', tips: '张艺谋导演，震撼实景演出。需提前购票'},
+                            {time: '22:30', activity: '酒店休息', location: '酒店', food: '', cost: '', tips: '明日游玩武夷山，早休息'}
+                        ]
+                    },
+                    {
+                        day: 2,
+                        title: '九曲溪竹筏漂流 + 天游峰',
+                        schedule: [
+                            {time: '07:00-07:30', activity: '酒店早餐', location: '酒店', food: '酒店自助早餐', cost: '含在房费', tips: '提前准备防晒、相机、水'},
+                            {time: '08:00-10:30', activity: '九曲溪竹筏漂流', location: '九曲溪', food: '', cost: '门票235元（三日联票）+竹筏130元', tips: '武夷山必玩！竹筏需提前预约。上午光线最佳。携带防晒'},
+                            {time: '11:00-12:00', activity: '武夷宫游览', location: '武夷宫', food: '', cost: '含在门票内', tips: '宋街、朱熹纪念馆，了解武夷文化'},
+                            {time: '12:30-13:30', activity: '午餐', location: '景区餐厅', food: '紫溪粉、笋干', cost: '约80元/人', tips: '景区餐饮较贵，可自带干粮'},
+                            {time: '14:00-17:30', activity: '天游峰登山', location: '天游峰', food: '', cost: '含在门票内', tips: '武夷第一胜地！登顶俯瞰九曲溪全景。约800级台阶，需2-3小时'},
+                            {time: '18:30-20:00', activity: '晚餐', location: '度假区', food: '武夷山野味', cost: '约130元/人', tips: '品尝竹笋、野菌等山珍'},
+                            {time: '20:30', activity: '酒店休息', location: '酒店', food: '', cost: '', tips: '今日步行较多，早休息'}
+                        ]
+                    },
+                    {
+                        day: 3,
+                        title: '大红袍景区 + 水帘洞 + 一线天',
+                        schedule: [
+                            {time: '08:00-09:00', activity: '前往大红袍景区', location: '大红袍景区', food: '', cost: '含在门票内', tips: '武夷岩茶发源地'},
+                            {time: '09:00-11:00', activity: '大红袍母树 + 茶文化体验', location: '大红袍景区', food: '品茶', cost: '约50元（品茶）', tips: '参观千年茶树，了解岩茶文化。可购买大红袍茶'},
+                            {time: '11:30-13:00', activity: '午餐', location: '度假区', food: '朱子孝母饼', cost: '约90元/人', tips: '当地特色糕点'},
+                            {time: '13:30-15:00', activity: '水帘洞游览', location: '水帘洞', food: '', cost: '含在门票内', tips: '武夷山最大洞穴，瀑布飞泻'},
+                            {time: '15:30-17:00', activity: '一线天探险', location: '一线天', food: '', cost: '含在门票内', tips: '两壁夹峙，仅容一人侧身通过。夏季有蝙蝠，注意防护'},
+                            {time: '17:30-18:00', activity: '虎啸岩（可选）', location: '虎啸岩', food: '', cost: '含在门票内', tips: '时间充裕可去，否则可省略'},
+                            {time: '18:30-20:00', activity: '晚餐', location: '度假区', food: '岚谷熏鹅', cost: '约120元/人', tips: '武夷名菜'},
+                            {time: '20:30', activity: '收拾行李，准备返程', location: '酒店', food: '', cost: '', tips: '整理好物品，次日返程'}
+                        ]
+                    },
+                    {
+                        day: 4,
+                        title: '武夷山 → 厦门/龙岩中转',
+                        schedule: [
+                            {time: '08:00-09:00', activity: '酒店早餐，退房', location: '酒店', food: '酒店早餐', cost: '含在房费', tips: '检查有无遗漏物品'},
+                            {time: '09:30-13:00', activity: '武夷山返回龙岩/厦门', location: '福建省内', food: '服务区午餐（约80元/人）', cost: '约80元/人', tips: '建议在龙岩或厦门中转，顺便游玩'},
+                            {time: '13:30-15:00', activity: '抵达中转城市，酒店入住', location: '龙岩或厦门', food: '', cost: '400元/晚', tips: '选择市中心酒店'},
+                            {time: '15:30-18:00', activity: '城市游览', location: '龙岩土楼或厦门鼓浪屿', food: '', cost: '根据选择', tips: '龙岩可看土楼，厦门可逛鼓浪屿'},
+                            {time: '18:30-20:00', activity: '当地美食晚餐', location: '市区', food: '客家菜或厦门海鲜', cost: '约130元/人', tips: '品尝当地特色'},
+                            {time: '20:30', activity: '酒店休息', location: '酒店', food: '', cost: '', tips: '明日返回广州'}
+                        ]
+                    },
+                    {
+                        day: 5,
+                        title: '返程日：中转城市 → 广州',
+                        schedule: [
+                            {time: '08:00-09:00', activity: '酒店早餐，退房', location: '酒店', food: '酒店早餐', cost: '含在房费', tips: '检查有无遗漏物品'},
+                            {time: '09:30-16:30', activity: '返回广州', location: '长深高速', food: '服务区午餐（约80元/人）', cost: '约80元/人', tips: '约700公里，安全驾驶'},
+                            {time: '17:00', activity: '抵达广州，旅程结束', location: '广州', food: '', cost: '', tips: '返程后好好休息'}
+                        ]
+                    }
+                ],
+                attractions: [
+                    {name: '九曲溪竹筏漂流', intro: '世界自然遗产核心景区，乘竹筏顺流而下，两岸丹霞地貌奇峰异石，美不胜收', time: '建议2-2.5小时', tickets: '竹筏130元（需另购景区门票235元）', tips: '必玩！需提前预约竹筏。上午光线最佳。携带防晒和相机防水'},
+                    {name: '天游峰', intro: '武夷第一胜地，登顶可俯瞰九曲溪全景和武夷群峰，云海日出壮观', time: '建议2-3小时', tickets: '含在景区门票内', tips: '约800级台阶，有一定难度。建议穿运动鞋。登顶景观震撼'},
+                    {name: '大红袍景区', intro: '武夷岩茶发源地，可参观千年大红袍母树，了解茶文化', time: '建议1.5-2小时', tickets: '含在景区门票内', tips: '可品茶、购茶。了解武夷岩茶文化'},
+                    {name: '一线天', intro: '武夷山最奇特景观，两壁对峙，中间仅容一人侧身通过，抬头仅见一线天空', time: '建议40分钟-1小时', tickets: '含在景区门票内', tips: '夏季洞内有蝙蝠。携带手电筒。胖的人可能过不去'},
+                    {name: '水帘洞', intro: '武夷山最大洞穴，瀑布从百米悬崖飞泻而下，形成水帘', time: '建议1小时', tickets: '含在景区门票内', tips: '雨季水量大更壮观。会被水雾打湿'}
+                ],
+                food: [
+                    {name: '岚谷熏鹅', location: '度假区餐厅', price: '约60元/只', recommend: '武夷山名菜，鹅肉熏制，皮脆肉嫩', tips: '当地必吃，可带真空包装回家'},
+                    {name: '紫溪粉', location: '各小吃店', price: '约15-20元/碗', recommend: '武夷山特色粉类，口感滑嫩', tips: '当地早餐常见'},
+                    {name: '瘦肉羹', location: '各餐厅', price: '约25元/碗', recommend: '福建特色，肉糜打成羹，口感独特', tips: '配紫溪粉做早餐'},
+                    {name: '朱子孝母饼', location: '特产店', price: '约20元/盒', recommend: '当地传统糕点，相传朱熹为母亲所做', tips: '适合当伴手礼'},
+                    {name: '大红袍茶', location: '大红袍景区、茶店', price: '约100-1000元/斤', recommend: '武夷岩茶之王，世界文化遗产', tips: '注意辨别真伪，建议正规茶店购买。价格差异大'}
+                ],
+                budget: {
+                    transport: {
+                        fuel: 1050,
+                        toll: 580,
+                        parking: 50,
+                        total: 1680
+                    },
+                    accommodation: {
+                        hotel: '武夷山酒店500元×2晚+中转城市400元=1400元',
+                        nights: 3,
+                        total: 1400
+                    },
+                    food: {
+                        breakfast: 140,
+                        lunch: 530,
+                        dinner: 700,
+                        total: 1370
+                    },
+                    tickets: {
+                        attractions: 583,
+                        others: 150,
+                        total: 733
+                    },
+                    total: 5183
+                },
+                tips: [
+                    {title: '⏰ 最佳时间', content: '春季3-5月（茶季）、秋季9-11月最佳。避开雨季和酷暑'},
+                    {title: '🚗 自驾建议', content: '路程较远（900公里），建议早出发。返程建议在龙岩/厦门中转'},
+                    {title: '🎫 门票攻略', content: '三日联票235元（含多个景区）。竹筏130元需单独买且提前预约'},
+                    {title: '🚣 竹筏漂流', content: '必须提前1-3天预约（旺季更早）。上午光线好。6人一筏，可拼筏'},
+                    {title: '⛰️ 登山准备', content: '天游峰有800级台阶，需2-3小时。穿运动鞋，带水。早上登山避开高温'},
+                    {title: '🍵 茶叶购买', content: '大红袍价格差异大，注意真伪。建议正规茶店购买。可现场品茶'},
+                    {title: '🎭 演出推荐', content: '印象大红袍值得一看（218元），张艺谋导演。需提前购票'},
+                    {title: '👟 穿着建议', content: '景区步行多，穿舒适运动鞋。一线天狭窄，胖的人可能过不去'},
+                    {title: '🦇 一线天提醒', content: '夏季洞内有大量蝙蝠，注意防护。带手电筒。不要大声喧哗'},
+                    {title: '🚨 注意事项', content: '福建山区天气多变，备好雨具。景区较大，合理安排时间'}
+                ],
+                bestTime: '春季3-5月（茶季）、秋季9-11月',
+                weather: '中亚热带季风气候，雨量充沛，四季分明',
+                specialNotes: '世界自然与文化双遗产。九曲溪竹筏必玩！需提前预约。大红袍茶文化值得体验。可与厦门连线游玩'
+            },
+            '凤凰古城': {
+                route: '广州 → 京港澳高速 → 包茂高速 → 凤凰（约850公里，9.5小时，建议中途休息）',
+                scenery: '途经湘南、湘西山区，苗族侗族风情渐浓',
+                itinerary: [
+                    {
+                        day: 1,
+                        title: '广州出发 → 凤凰古城（约850公里，9.5小时）',
+                        schedule: [
+                            {time: '06:30-16:30', activity: '广州出发，长途驾驶前往凤凰', location: '京港澳高速→包茂高速', food: '服务区用餐（约120元/人）', cost: '约120元/人', tips: '全天驾驶，建议两位司机轮换。湘西山路多，注意安全'},
+                            {time: '17:00-18:00', activity: '抵达凤凰，客栈入住', location: '凤凰古城内客栈', food: '', cost: '400元/晚', tips: '建议住江边客栈，可看沱江夜景。古城内车不能进，需停外围'},
+                            {time: '18:30-20:00', activity: '古城初体验，晚餐', location: '凤凰古城', food: '血粑鸭', cost: '约120元/人', tips: '凤凰特色菜，必吃！'},
+                            {time: '20:30-22:00', activity: '沱江夜景漫步', location: '沱江两岸', food: '', cost: '0元', tips: '古城夜景最美，红灯笼映照江面，如诗如画'},
+                            {time: '22:30', activity: '客栈休息', location: '客栈', food: '', cost: '', tips: '明日游古城，早休息'}
+                        ]
+                    },
+                    {
+                        day: 2,
+                        title: '凤凰古城深度游',
+                        schedule: [
+                            {time: '07:30-09:00', activity: '清晨古城漫步', location: '凤凰古城', food: '米豆腐早餐', cost: '约20元/人', tips: '清晨的古城最安静，适合拍照。吊脚楼晨景很美'},
+                            {time: '09:30-11:30', activity: '沈从文故居 + 古城九景', location: '古城内', food: '', cost: '古城通票148元', tips: '沈从文故居、杨家祠堂、熊希龄故居等9个景点'},
+                            {time: '12:00-13:30', activity: '古城特色午餐', location: '古城内', food: '酸汤鱼、苗家社饭', cost: '约100元/人', tips: '酸汤鱼是湘西特色'},
+                            {time: '14:00-16:00', activity: '沱江泛舟', location: '沱江', food: '', cost: '船票98元', tips: '乘船游沱江，从水上欣赏吊脚楼，别有韵味'},
+                            {time: '16:30-18:00', activity: '虹桥、东门城楼', location: '虹桥、东门', food: '姜糖、猕猴桃', cost: '约30元', tips: '虹桥是凤凰地标，可登楼俯瞰全城'},
+                            {time: '18:30-20:00', activity: '晚餐', location: '古城内', food: '苗家酸菜炒肉', cost: '约90元/人', tips: '酸菜是湘西特色'},
+                            {time: '20:30-22:00', activity: '古城酒吧街', location: '沱江两岸酒吧', food: '饮料、小吃', cost: '约80元/人', tips: '凤凰夜生活丰富，可选择安静的清吧'}
+                        ]
+                    },
+                    {
+                        day: 3,
+                        title: '奇梁洞 + 南华山',
+                        schedule: [
+                            {time: '08:30-09:30', activity: '驾车前往奇梁洞', location: '奇梁洞（距古城6公里）', food: '', cost: '', tips: '被誉为"华夏第二奇洞"'},
+                            {time: '09:30-11:30', activity: '奇梁洞游览', location: '奇梁洞景区', food: '', cost: '门票80元', tips: '溶洞景观丰富，钟乳石形态各异。洞内温度低，带外套'},
+                            {time: '12:00-13:00', activity: '午餐', location: '返回古城', food: '米粉、小吃', cost: '约60元/人', tips: '简单用餐'},
+                            {time: '14:00-17:00', activity: '南华山徒步（可选）', location: '南华山', food: '', cost: '免费', tips: '登山可俯瞰凤凰全景。体力不够可选择古城逛街'},
+                            {time: '17:30-19:00', activity: '古城购物', location: '古城商业街', food: '姜糖、银饰', cost: '特产约200元', tips: '购买姜糖、银饰、扎染等特产'},
+                            {time: '19:30-21:00', activity: '告别晚餐', location: '古城', food: '血粑鸭、酸汤鱼', cost: '约120元/人', tips: '最后品尝凤凰美食'},
+                            {time: '21:30', activity: '早休息', location: '客栈', food: '', cost: '', tips: '明日可返程或前往张家界'}
+                        ]
+                    },
+                    {
+                        day: 4,
+                        title: '凤凰 → 怀化/长沙中转',
+                        schedule: [
+                            {time: '08:30-09:30', activity: '客栈早餐，退房', location: '客栈', food: '客栈早餐', cost: '含在房费', tips: '检查有无遗漏物品'},
+                            {time: '10:00-14:00', activity: '凤凰返回怀化/长沙', location: '包茂高速', food: '服务区午餐（约80元/人）', cost: '约80元/人', tips: '建议在长沙中转，顺便游玩长沙'},
+                            {time: '14:30-16:00', activity: '抵达长沙，酒店入住', location: '长沙市区', food: '', cost: '400元/晚', tips: '选择五一广场或橘子洲附近酒店'},
+                            {time: '16:30-18:00', activity: '橘子洲散步', location: '橘子洲', food: '', cost: '免费', tips: '长沙标志景点，毛泽东雕像'},
+                            {time: '18:30-20:00', activity: '坡子街美食', location: '坡子街', food: '臭豆腐、口味虾', cost: '约100元/人', tips: '长沙美食天堂'},
+                            {time: '20:30', activity: '酒店休息', location: '酒店', food: '', cost: '', tips: '明日返回广州'}
+                        ]
+                    },
+                    {
+                        day: 5,
+                        title: '返程日：长沙 → 广州',
+                        schedule: [
+                            {time: '08:00-09:00', activity: '酒店早餐，退房', location: '酒店', food: '酒店早餐', cost: '含在房费', tips: '检查有无遗漏物品'},
+                            {time: '09:30-16:00', activity: '长沙返回广州', location: '京港澳高速', food: '服务区午餐（约80元/人）', cost: '约80元/人', tips: '约600公里，安全驾驶'},
+                            {time: '16:30', activity: '抵达广州，旅程结束', location: '广州', food: '', cost: '', tips: '返程后好好休息'}
+                        ]
+                    }
+                ],
+                attractions: [
+                    {name: '凤凰古城', intro: '中国最美古城之一，沈从文笔下的边城，吊脚楼沿沱江而建，苗族侗族风情浓郁', time: '建议1-2天', tickets: '古城免费（九景通票148元）', tips: '清晨和夜晚最美。住江边客栈可看沱江夜景。古城内车辆禁行'},
+                    {name: '沱江泛舟', intro: '乘船游览沱江，从水上欣赏古城吊脚楼、虹桥、跳岩，体验最美的凤凰', time: '建议1小时', tickets: '98元', tips: '下午3-5点光线最佳。可以穿苗服拍照'},
+                    {name: '沈从文故居', intro: '文学大师沈从文的故居，了解边城作者的生平和创作历程', time: '建议30分钟', tickets: '含在九景通票内', tips: '《边城》《湘西》等作品在此诞生'},
+                    {name: '奇梁洞', intro: '被誉为"华夏第二奇洞"，溶洞景观丰富，钟乳石形态各异', time: '建议1.5-2小时', tickets: '80元', tips: '洞内温度低（15度），需带外套。景观震撼'},
+                    {name: '虹桥', intro: '凤凰地标建筑，横跨沱江的风雨桥，可登楼俯瞰古城全景', time: '建议30分钟', tickets: '含在九景通票内', tips: '白天和夜晚各有特色，都值得去'}
+                ],
+                food: [
+                    {name: '血粑鸭', location: '古城内各餐厅', price: '约60-80元/份', recommend: '凤凰第一名菜，鸭血制成粑，配鸭肉炒制', tips: '必吃！老街饭店、大使饭店的较正宗'},
+                    {name: '酸汤鱼', location: '古城内', price: '约100-150元/人', recommend: '湘西特色，酸辣开胃，鱼肉鲜嫩', tips: '红酸汤或白酸汤，各有特色'},
+                    {name: '苗家社饭', location: '古城小吃店', price: '约15-20元/份', recommend: '苗族传统食品，糯米饭配腊肉、野菜', tips: '春季清明时节最地道'},
+                    {name: '米豆腐', location: '街边小摊', price: '约8-10元/碗', recommend: '凤凰特色小吃，口感滑嫩', tips: '早餐摊最多，加酸辣酱很开胃'},
+                    {name: '姜糖', location: '古城商业街', price: '约20元/盒', recommend: '凤凰特产，手工制作，香甜微辣', tips: '适合当伴手礼，现场表演拉糖很有趣'}
+                ],
+                budget: {
+                    transport: {
+                        fuel: 1000,
+                        toll: 550,
+                        parking: 80,
+                        total: 1630
+                    },
+                    accommodation: {
+                        hotel: '凤凰客栈400元×2晚+长沙酒店400元=1200元',
+                        nights: 3,
+                        total: 1200
+                    },
+                    food: {
+                        breakfast: 140,
+                        lunch: 540,
+                        dinner: 630,
+                        total: 1310
+                    },
+                    tickets: {
+                        attractions: 406,
+                        others: 150,
+                        total: 556
+                    },
+                    total: 4696
+                },
+                tips: [
+                    {title: '⏰ 最佳时间', content: '3-5月（春季）、9-11月（秋季）最佳。避开雨季和黄金周'},
+                    {title: '🚗 自驾建议', content: '路程较远（850公里），建议早出发。古城内禁止车辆通行，需停外围停车场（20-30元/天）'},
+                    {title: '🏨 住宿推荐', content: '强烈建议住古城内江边客栈，可看沱江夜景。提前预订，旺季价格翻倍'},
+                    {title: '🎫 门票说明', content: '古城免费。九景通票148元（沈从文故居、杨家祠堂等）。沱江泛舟98元需单独买'},
+                    {title: '📸 拍照时机', content: '清晨7-9点古城最安静，适合拍照。夜景20-22点最美，红灯笼映江面'},
+                    {title: '🍜 美食推荐', content: '必吃血粑鸭、酸汤鱼。米豆腐做早餐。姜糖当伴手礼'},
+                    {title: '🛍️ 购物提醒', content: '银饰、扎染、姜糖是主要特产。银饰注意真假，要砍价'},
+                    {title: '🎭 民俗体验', content: '可租苗服拍照（50-100元）。晚上有篝火晚会（另收费）'},
+                    {title: '🗺️ 行程建议', content: '凤凰2-3天。可与张家界连线（约4小时车程）。返程建议经长沙中转'},
+                    {title: '🚨 注意事项', content: '旺季人很多，提前订房。注意防晒。湘西山路多，雨天小心驾驶'}
+                ],
+                bestTime: '3-5月（春季）、9-11月（秋季）',
+                weather: '亚热带湿润季风气候，雨水较多',
+                specialNotes: '中国最美古城，必住江边客栈看夜景。古城内车辆禁行，需停外围。可与张家界连线游玩'
+            },
+            '岳阳': {
+                route: '广州 → 京港澳高速 → 岳阳（约600公里，6.5小时）',
+                scenery: '途经韶关、长沙，从粤北山区到洞庭湖平原',
+                attractions: ['岳阳楼', '君山岛', '洞庭湖', '汴河街', '南湖'],
+                food: ['巴陵全鱼席', '洞庭银鱼', '君山银针茶', '平江酱干', '长乐甜酒'],
+                budget: {
+                    fuel: 700,
+                    toll: 380,
+                    accommodation: 700,
+                    food: 1100,
+                    tickets: 400,
+                    total: 3280
+                }
+            },
+            '郴州': {
+                route: '广州 → 京港澳高速 → 郴州（约350公里，4小时）',
+                scenery: '途经韶关，粤湘边界山区风光',
+                attractions: ['东江湖', '莽山国家森林公园', '苏仙岭', '飞天山', '汝城温泉'],
+                food: ['东江鱼', '临武鸭', '栖凤渡鱼粉', '坛子肉', '血鸭'],
+                budget: {
+                    fuel: 420,
+                    toll: 220,
+                    accommodation: 700,
+                    food: 1000,
+                    tickets: 500,
+                    total: 2840
+                }
+            },
+            '景德镇': {
+                route: '广州 → 京港澳高速 → 济广高速 → 景德镇（约850公里，9.5小时）',
+                scenery: '途经江西山区，古窑址遍布的瓷都风光',
+                attractions: ['古窑民俗博览区', '瑶里古镇', '浮梁古县衙', '陶瓷博物馆', '御窑遗址'],
+                food: ['冷粉', '饺子粑', '碱水粑', '油条包麻糍', '瓷泥煨鸡'],
+                budget: {
+                    fuel: 1000,
+                    toll: 540,
+                    accommodation: 800,
+                    food: 1100,
+                    tickets: 500,
+                    total: 3940
+                }
+            },
+            '庐山': {
+                route: '广州 → 京港澳高速 → 福银高速 → 庐山（约800公里，9小时）',
+                scenery: '途经江西，鄱阳湖平原到庐山风景区',
+                attractions: ['庐山风景区', '三叠泉', '五老峰', '芦林湖', '白鹿洞书院'],
+                food: ['庐山石鸡', '庐山石鱼', '庐山石耳', '三杯石鸡', '鄱阳湖银鱼'],
+                budget: {
+                    fuel: 950,
+                    toll: 510,
+                    accommodation: 1000,
+                    food: 1200,
+                    tickets: 800,
+                    total: 4460
+                }
+            },
+            '婺源': {
+                route: '广州 → 京港澳高速 → 济广高速 → 婺源（约850公里，9.5小时）',
+                scenery: '途经江西东北部，徽派建筑与油菜花海',
+                attractions: ['江湾', '篁岭', '李坑', '汪口', '彩虹桥', '思溪延村'],
+                food: ['荷包红鲤鱼', '粉蒸肉', '糊豆腐', '汽糕', '清明果'],
+                budget: {
+                    fuel: 1000,
+                    toll: 540,
+                    accommodation: 900,
+                    food: 1100,
+                    tickets: 700,
+                    total: 4240
+                }
+            },
+            '井冈山': {
+                route: '广州 → 京港澳高速 → 泉南高速 → 井冈山（约750公里，8.5小时）',
+                scenery: '途经赣南山区，革命老区红色风光',
+                attractions: ['井冈山革命博物馆', '黄洋界', '龙潭瀑布', '笔架山', '茨坪'],
+                food: ['井冈烟笋', '永新狗肉', '红米饭南瓜汤', '全副銮驾', '炒石鸡'],
+                budget: {
+                    fuel: 900,
+                    toll: 480,
+                    accommodation: 800,
+                    food: 1000,
+                    tickets: 600,
+                    total: 3780
+                }
+            },
+            '黔东南': {
+                route: '广州 → 广昆高速 → 厦蓉高速 → 黔东南（约900公里，10小时，建议中途休息）',
+                scenery: '途经贵州山区，苗族侗族村寨密布，梯田风光',
+                attractions: ['西江千户苗寨', '镇远古镇', '肇兴侗寨', '加榜梯田', '岜沙苗寨'],
+                food: ['酸汤鱼', '苗家腌鱼', '侗家油茶', '牛瘪火锅', '竹筒饭'],
+                budget: {
+                    fuel: 1050,
+                    toll: 570,
+                    accommodation: 900,
+                    food: 1200,
+                    tickets: 700,
+                    total: 4420
+                }
+            },
+            '荔波': {
+                route: '广州 → 广昆高速 → 兰海高速 → 荔波（约850公里，9.5小时）',
+                scenery: '途经贵州南部，喀斯特原始森林和瀑布群',
+                attractions: ['小七孔', '大七孔', '茂兰喀斯特森林', '水春河漂流', '瑶山古寨'],
+                food: ['荔波鱼包韭菜', '酸肉', '豆花烤鱼', '牛肉粉', '杨梅汤'],
+                budget: {
+                    fuel: 1000,
+                    toll: 540,
+                    accommodation: 900,
+                    food: 1200,
+                    tickets: 800,
+                    total: 4440
+                }
+            },
+            '黄果树': {
+                route: '广州 → 广昆高速 → 黄果树（约950公里，11小时，建议中途休息）',
+                scenery: '途经贵州高原，喀斯特地貌典型，瀑布景观壮观',
+                itinerary: [
+                    {
+                        day: 1,
+                        title: '广州出发 → 黄果树（约950公里，11小时）',
+                        schedule: [
+                            {time: '06:30-18:00', activity: '广州出发，长途驾驶前往黄果树', location: '广昆高速→沪昆高速', food: '服务区用餐（约120元/人）', cost: '约120元/人', tips: '全天驾驶，建议两位司机轮换。贵州山路多，注意安全'},
+                            {time: '18:30-19:30', activity: '抵达黄果树，酒店入住', location: '黄果树镇酒店', food: '', cost: '450元/晚', tips: '选择景区附近酒店，方便第二天游玩'},
+                            {time: '20:00-21:30', activity: '黄果树镇晚餐', location: '镇上餐厅', food: '贵州酸汤鱼', cost: '约100元/人', tips: '品尝贵州特色美食，早点休息'},
+                            {time: '22:00', activity: '早休息，准备次日行程', location: '酒店', food: '', cost: '', tips: '今日驾驶较累，充分休息'}
+                        ]
+                    },
+                    {
+                        day: 2,
+                        title: '黄果树大瀑布 + 天星桥景区',
+                        schedule: [
+                            {time: '07:30-08:00', activity: '酒店早餐', location: '酒店', food: '酒店自助早餐', cost: '含在房费', tips: '提前准备好相机、雨衣（瀑布会湿身）'},
+                            {time: '08:30-12:00', activity: '黄果树大瀑布游览', location: '黄果树大瀑布景区', food: '', cost: '门票160元+观光车50元', tips: '亚洲第一大瀑布！可走水帘洞，备好雨衣。7-10月水量最大'},
+                            {time: '12:30-13:30', activity: '景区午餐', location: '景区餐厅', food: '简餐', cost: '约80元/人', tips: '景区餐饮较贵，可自带干粮'},
+                            {time: '14:00-17:00', activity: '天星桥景区', location: '天星桥', food: '', cost: '含在门票内', tips: '喀斯特地貌精华，水上石林。需步行2-3小时'},
+                            {time: '17:30-18:30', activity: '陡坡塘瀑布（可选）', location: '陡坡塘瀑布', food: '', cost: '含在门票内', tips: '西游记片头取景地，时间充裕可游览'},
+                            {time: '19:00-20:30', activity: '晚餐', location: '黄果树镇', food: '关岭断桥烙锅', cost: '约120元/人', tips: '当地特色火锅，麻辣鲜香'},
+                            {time: '21:00', activity: '酒店休息', location: '酒店', food: '', cost: '', tips: '今日步行较多，好好休息'}
+                        ]
+                    },
+                    {
+                        day: 3,
+                        title: '龙宫景区一日游',
+                        schedule: [
+                            {time: '08:00-09:00', activity: '驾车前往龙宫', location: '龙宫景区（距黄果树35公里）', food: '', cost: '', tips: '中国最长水溶洞'},
+                            {time: '09:30-13:00', activity: '龙宫景区游览', location: '龙宫', food: '', cost: '门票150元', tips: '乘船游览地下暗河，观赏钟乳石。洞内较冷，带外套'},
+                            {time: '13:30-14:30', activity: '龙宫附近午餐', location: '景区餐厅', food: '豆腐圆子、波波糖', cost: '约90元/人', tips: '品尝当地小吃'},
+                            {time: '15:00-17:00', activity: '返回黄果树，自由活动', location: '黄果树镇', food: '', cost: '', tips: '可在镇上购买特产：波波糖、蜡染'},
+                            {time: '18:00-19:30', activity: '特色晚餐', location: '黄果树镇', food: '花江狗肉（或其他特色菜）', cost: '约100元/人', tips: '当地名菜，不吃狗肉可选其他'},
+                            {time: '20:00', activity: '收拾行李，准备返程', location: '酒店', food: '', cost: '', tips: '整理好物品，次日返程'}
+                        ]
+                    },
+                    {
+                        day: 4,
+                        title: '黄果树 → 安顺（织金洞）',
+                        schedule: [
+                            {time: '08:00-10:00', activity: '驾车前往织金洞', location: '织金洞（距黄果树130公里）', food: '', cost: '', tips: '中国最美溶洞，世界地质公园'},
+                            {time: '10:30-13:00', activity: '织金洞游览', location: '织金洞景区', food: '', cost: '门票120元', tips: '洞内景观震撼，各种钟乳石造型。洞内温度低，带外套'},
+                            {time: '13:30-14:30', activity: '午餐', location: '织金县城', food: '当地小吃', cost: '约70元/人', tips: '简单用餐后开始返程'},
+                            {time: '15:00-19:00', activity: '返程第一段：织金 → 贵阳', location: '贵阳（约150公里）', food: '', cost: '', tips: '建议在贵阳住一晚，分段返程'},
+                            {time: '19:30-21:00', activity: '贵阳晚餐', location: '贵阳市区', food: '丝娃娃、酸汤鱼', cost: '约120元/人', tips: '品尝贵阳特色美食'},
+                            {time: '21:30', activity: '酒店休息', location: '贵阳酒店', food: '', cost: '400元/晚', tips: '明日继续返程'}
+                        ]
+                    },
+                    {
+                        day: 5,
+                        title: '返程日：贵阳 → 广州',
+                        schedule: [
+                            {time: '08:00-09:00', activity: '酒店早餐，退房', location: '贵阳酒店', food: '酒店早餐', cost: '含在房费', tips: '检查有无遗漏物品'},
+                            {time: '09:30-17:00', activity: '贵阳返回广州', location: '沪昆高速→广昆高速', food: '服务区午餐（约80元/人）', cost: '约80元/人', tips: '约800公里，全天驾驶，注意安全'},
+                            {time: '17:30', activity: '抵达广州，旅程结束', location: '广州', food: '', cost: '', tips: '返程后好好休息'}
+                        ]
+                    }
+                ],
+                attractions: [
+                    {name: '黄果树大瀑布', intro: '亚洲第一大瀑布，高77.8米宽101米，可走水帘洞穿瀑布而过，气势磅礴', time: '建议2.5-3小时', tickets: '160元（含陡坡塘、天星桥）+观光车50元', tips: '7-10月水量最大最壮观。一定要买雨衣或带雨具。可走水帘洞'},
+                    {name: '天星桥景区', intro: '喀斯特地貌精华，水上石林，石、树、水完美结合，有365个石阶对应生日', time: '建议2-3小时', tickets: '含在黄果树门票内', tips: '景区较大，需步行2-3小时。寻找自己的生日石很有趣'},
+                    {name: '陡坡塘瀑布', intro: '黄果树瀑布群中瀑顶最宽的瀑布，86版西游记片头取景地', time: '建议30分钟-1小时', tickets: '含在黄果树门票内', tips: '离黄果树大瀑布最近，可顺路游览'},
+                    {name: '龙宫景区', intro: '中国最长水溶洞，乘船游览地下暗河，钟乳石造型各异，堪称地下艺术宫殿', time: '建议2.5-3小时', tickets: '150元', tips: '洞内温度低（约15度），需带外套。乘船游览很特别'},
+                    {name: '织金洞', intro: '中国最美溶洞，世界地质公园，洞内景观震撼，各种钟乳石造型令人叹为观止', time: '建议2-3小时', tickets: '120元', tips: '洞内温度低，带外套。景观非常震撼，值得一去'}
+                ],
+                food: [
+                    {name: '关岭断桥烙锅', location: '黄果树镇各餐厅', price: '约120元/人', recommend: '贵州特色火锅，麻辣鲜香，蔬菜肉类烤制', tips: '当地必吃美食，类似干锅'},
+                    {name: '酸汤鱼', location: '各餐厅', price: '约100-150元/人', recommend: '贵州名菜，酸辣开胃，鱼肉鲜嫩', tips: '贵州必吃，红酸汤最经典'},
+                    {name: '镇宁波波糖', location: '特产店', price: '约20-30元/盒', recommend: '当地特产，芝麻花生糖，香脆可口', tips: '适合买来当伴手礼'},
+                    {name: '豆腐圆子', location: '各小吃店', price: '约15元/份', recommend: '当地特色小吃，豆腐丸子油炸', tips: '街边小吃，现做现吃'},
+                    {name: '花江狗肉', location: '黄果树镇', price: '约100元/人', recommend: '当地名菜，做法独特', tips: '不吃狗肉的可选其他菜品'}
+                ],
+                budget: {
+                    transport: {
+                        fuel: 1100,
+                        toll: 600,
+                        parking: 50,
+                        total: 1750
+                    },
+                    accommodation: {
+                        hotel: '黄果树酒店450元×2晚+贵阳酒店400元=1300元',
+                        nights: 3,
+                        total: 1300
+                    },
+                    food: {
+                        breakfast: 120,
+                        lunch: 540,
+                        dinner: 640,
+                        total: 1300
+                    },
+                    tickets: {
+                        attractions: 680,
+                        others: 100,
+                        total: 780
+                    },
+                    total: 5130
+                },
+                tips: [
+                    {title: '⏰ 最佳时间', content: '7-10月雨季水量最大，瀑布最壮观。春秋两季也不错'},
+                    {title: '🚗 自驾建议', content: '路程较远（950公里），建议早出发。贵州山路多，注意安全。返程建议在贵阳中转'},
+                    {title: '💧 防水准备', content: '黄果树瀑布会湿身！务必买雨衣（景区10元）或带雨具。相机做好防水'},
+                    {title: '🧥 温差提醒', content: '溶洞内温度低（15度左右），即使夏天也要带外套'},
+                    {title: '👟 穿着建议', content: '景区步行多，穿舒适防滑运动鞋。天星桥有水路，鞋子防水更好'},
+                    {title: '🎫 门票优化', content: '黄果树通票含3个景区（大瀑布、天星桥、陡坡塘）。两日有效，可分两天游'},
+                    {title: '📸 拍照时机', content: '上午9-11点光线最佳。彩虹一般出现在晴天上午'},
+                    {title: '🍜 美食推荐', content: '必吃酸汤鱼、断桥烙锅。波波糖适合当伴手礼'},
+                    {title: '🗺️ 行程建议', content: '黄果树瀑布群需1天。龙宫半天。织金洞在返程路上可顺路游'},
+                    {title: '🚨 注意事项', content: '贵州天气多变，随时可能下雨，备好雨具。景区台阶多，注意安全'}
+                ],
+                bestTime: '7-10月（雨季水量大），春秋季节也适宜',
+                weather: '亚热带湿润气候，夏季多雨，气候凉爽',
+                specialNotes: '黄果树是亚洲第一大瀑布，7-10月水量最大最壮观。路程较远，建议分段返程。溶洞景区很冷，需带外套'
+            },
+            '镇远': {
+                route: '广州 → 广昆高速 → 厦蓉高速 → 镇远（约900公里，10小时）',
+                scenery: '途经贵州东部，舞阳河沿岸古镇风光',
+                attractions: ['镇远古镇', '舞阳河', '青龙洞', '石屏山', '铁溪'],
+                food: ['道菜', '陈年道菜', '酸汤鱼', '社饭', '米豆腐'],
+                budget: {
+                    fuel: 1050,
+                    toll: 570,
+                    accommodation: 800,
+                    food: 1100,
+                    tickets: 500,
+                    total: 4020
+                }
+            },
+            '大理': {
+                route: '广州 → 广昆高速 → 大理（约1600公里，建议分2-3天，途经南宁、昆明）',
+                scenery: '从广西喀斯特到云南高原，苍山洱海风光，白族风情浓郁',
+
+                itinerary: [
+                    {day: 1, title: '广州出发 → 南宁（中转）', schedule: [
+                        {time: '08:00-14:00', activity: '广州前往南宁', transport: '广昆高速', cost: '油费约350元，过路费约185元', tips: '第一天到南宁住一晚，路程580公里'},
+                        {time: '14:00-15:30', activity: '抵达南宁，酒店入住', location: '南宁市区'},
+                        {time: '18:00-20:00', activity: '中山路美食街', food: '老友粉、螺蛳粉', cost: '约100元'}
+                    ]},
+                    {day: 2, title: '南宁 → 昆明（长途）', schedule: [
+                        {time: '07:00-17:00', activity: '南宁前往昆明', transport: '广昆高速', cost: '油费约550元，过路费约400元', tips: '路程约900公里，建议分段休息'},
+                        {time: '17:00-18:30', activity: '抵达昆明，酒店入住', location: '昆明市区'},
+                        {time: '19:00-21:00', activity: '晚餐', food: '过桥米线', cost: '约120元'}
+                    ]},
+                    {day: 3, title: '昆明 → 大理', schedule: [
+                        {time: '08:00-13:00', activity: '昆明前往大理', transport: '杭瑞高速', cost: '油费约180元，过路费约100元', tips: '约330公里'},
+                        {time: '13:00-14:30', activity: '抵达大理，酒店入住', location: '大理古城或才村', tips: '建议住洱海边，景色好'},
+                        {time: '15:00-18:00', activity: '大理古城闲逛', location: '大理古城', tickets: '免费', tips: '五华楼、洋人街'},
+                        {time: '18:30-20:00', activity: '晚餐', food: '砂锅鱼、乳扇', cost: '约150元'}
+                    ]},
+                    {day: 4, title: '环洱海一日游', schedule: [
+                        {time: '08:00-12:00', activity: '洱海东线', location: '双廊、挖色', tips: '自驾环海东路，双廊古镇、海东公路拍照'},
+                        {time: '12:00-13:30', activity: '双廊午餐', food: '白族菜', cost: '约150元'},
+                        {time: '14:00-18:00', activity: '喜洲古镇', location: '喜洲', tips: '白族民居、喜洲粑粑、海舌公园'},
+                        {time: '18:30-20:00', activity: '返回古城，晚餐', food: '白族三道茶', cost: '约120元'}
+                    ]},
+                    {day: 5, title: '苍山 + 崇圣寺三塔 + 返程', schedule: [
+                        {time: '08:00-11:30', activity: '苍山索道', location: '苍山', tickets: '约280元（含索道）', tips: '洗马潭索道，俯瞰洱海'},
+                        {time: '12:00-13:00', activity: '午餐', cost: '约100元'},
+                        {time: '13:30-15:30', activity: '崇圣寺三塔', tickets: '75元', tips: '大理地标，拍照打卡'},
+                        {time: '16:00', activity: '开始返程', tips: '建议在昆明住一晚，第6天返回广州'}
+                    ]}
+                ],
+
+                attractions: [
+                    {name: '洱海', intro: '高原湖泊，环海自驾最美', time: '1天', tickets: '免费', tips: '双廊、才村、海西最美，租车环海'},
+                    {name: '大理古城', intro: '白族古城，洋人街', time: '半天', tickets: '免费', tips: '五华楼、洋人街、人民路'},
+                    {name: '苍山', intro: '19峰18溪，索道观景', time: '半天', tickets: '280元（含索道）', tips: '洗马潭索道最高，俯瞰洱海'},
+                    {name: '双廊古镇', intro: '洱海边最美古镇', time: '3小时', tickets: '免费', tips: '海景客栈、文艺小店'},
+                    {name: '喜洲古镇', intro: '白族民居，喜洲粑粑', time: '2小时', tickets: '免费', tips: '海舌公园适合拍照'}
+                ],
+
+                food: [
+                    {name: '砂锅鱼', location: '古城餐馆', price: '80-150元', recommend: '洱海砂锅鱼', tips: '白族特色'},
+                    {name: '喜洲粑粑', location: '喜洲古镇', price: '10-15元', recommend: '甜咸两种', tips: '现烤最香'},
+                    {name: '乳扇', location: '各餐馆', price: '20-30元', recommend: '炸乳扇、烤乳扇', tips: '奶制品，独特'},
+                    {name: '白族三道茶', location: '古城茶馆', price: '50-80元', recommend: '一苦二甜三回味', tips: '白族茶文化'}
+                ],
+
+                budget: {
+                    transport: {fuel: 1800, toll: 1000, parking: 100, total: 2900},
+                    accommodation: {hotel: '300-400元/晚', nights: 5, total: 1800},
+                    food: {breakfast: 30, lunch: 120, dinner: 150, total: 1500},
+                    tickets: {attractions: 600, others: 200, total: 800},
+                    shopping: 300,
+                    total: 7300,
+                    notes: '以上为2人预算，含中转住宿，人均约3650元'
+                },
+
+                tips: [
+                    {title: '路程', content: '距离远，建议分段：D1广州-南宁，D2南宁-昆明，D3昆明-大理'},
+                    {title: '住宿', content: '建议住洱海边（才村、双廊），海景房体验好'},
+                    {title: '最佳时间', content: '3-5月、9-11月，避开暑期'},
+                    {title: '环海', content: '租电动车或自驾，120公里，一天可环完'},
+                    {title: '高原', content: '大理海拔1900米，注意高反，带防晒'}
+                ],
+
+                bestTime: '3-5月（花开）、9-11月（秋爽）',
+                weather: '高原气候，四季如春，紫外线强',
+                specialNotes: '大理适合慢生活，建议5-7天。距离远，建议分段自驾或飞机+租车'
+            },
+            '丽江': {
+                route: '广州 → 广昆高速 → 大丽高速 → 丽江（约1800公里，建议分3天驾驶）',
+                scenery: '途经云贵高原，玉龙雪山、高原湖泊，纳西族风情',
+                itinerary: [
+                    {
+                        day: 1,
+                        title: '广州 → 南宁（约570公里，7小时）',
+                        schedule: [
+                            {time: '07:00-14:00', activity: '广州出发，驾车前往南宁', location: '广昆高速', food: '服务区简餐（约60元/人）', cost: '约60元/人', tips: '早点出发避开高峰，每2小时休息一次'},
+                            {time: '14:30-16:00', activity: '抵达南宁，酒店休息', location: '青秀区酒店', food: '', cost: '500元/晚', tips: '选择市中心酒店，方便晚上逛街'},
+                            {time: '18:00-20:00', activity: '中山路美食街晚餐', location: '中山路夜市', food: '老友粉、卷筒粉、芒果捞', cost: '约100元/人', tips: '尝试本地特色小吃'},
+                            {time: '20:30-22:00', activity: '邕江夜景散步', location: '邕江滨江公园', food: '', cost: '0元', tips: '欣赏南宁夜景，放松身心'}
+                        ]
+                    },
+                    {
+                        day: 2,
+                        title: '南宁 → 昆明（约850公里，10小时）',
+                        schedule: [
+                            {time: '06:30-17:00', activity: '南宁出发，长途驾驶前往昆明', location: '广昆高速', food: '服务区用餐（约150元/人）', cost: '约150元/人', tips: '全程最长驾驶日，建议两位司机轮换'},
+                            {time: '17:30-19:00', activity: '抵达昆明，酒店入住', location: '翠湖附近酒店', food: '', cost: '450元/晚', tips: '提前预订昆明酒店'},
+                            {time: '19:30-21:00', activity: '南屏步行街晚餐', location: '南屏街', food: '过桥米线、汽锅鸡', cost: '约120元/人', tips: '品尝正宗云南美食'},
+                            {time: '21:30', activity: '早休息，准备次日行程', location: '酒店', food: '', cost: '', tips: '高原地区，注意补水休息'}
+                        ]
+                    },
+                    {
+                        day: 3,
+                        title: '昆明 → 丽江（约510公里，6小时） + 丽江古城',
+                        schedule: [
+                            {time: '07:00-13:00', activity: '昆明出发，驾车前往丽江', location: '大丽高速', food: '服务区简餐（约70元/人）', cost: '约70元/人', tips: '沿途海拔逐渐升高，注意高原反应'},
+                            {time: '13:30-15:00', activity: '抵达丽江，客栈入住', location: '丽江古城内客栈', food: '', cost: '400元/晚', tips: '选择古城内特色客栈，步行游览方便'},
+                            {time: '15:30-18:30', activity: '丽江古城漫步', location: '四方街、木府', food: '鸡豆凉粉、丽江粑粑', cost: '木府门票60元', tips: '古城不收门票，但木府需单独购票'},
+                            {time: '19:00-20:30', activity: '丽江古城特色晚餐', location: '忠义市场', food: '腊排骨火锅', cost: '约150元/人', tips: '忠义市场腊排骨最地道'},
+                            {time: '21:00-22:30', activity: '古城夜景、酒吧街', location: '酒吧一条街', food: '啤酒、小吃', cost: '约100元/人', tips: '可以选择安静的清吧或热闹的火吧'}
+                        ]
+                    },
+                    {
+                        day: 4,
+                        title: '玉龙雪山一日游',
+                        schedule: [
+                            {time: '07:00-08:00', activity: '客栈早餐，准备登山装备', location: '古城客栈', food: '客栈早餐', cost: '含在房费', tips: '提前租好羽绒服和氧气瓶'},
+                            {time: '08:30-09:30', activity: '驾车前往玉龙雪山景区', location: '玉龙雪山', food: '', cost: '景区门票100元+大索道180元', tips: '建议7-8点出发，避开人流高峰'},
+                            {time: '10:00-13:00', activity: '乘坐大索道，游览冰川公园', location: '冰川公园（海拔4680米）', food: '自带干粮', cost: '氧气瓶60元', tips: '缓慢行动，防止高反。拍照留念'},
+                            {time: '13:30-15:00', activity: '蓝月谷游览', location: '蓝月谷', food: '', cost: '电瓶车50元（可选）', tips: '蓝月谷水质清澈，是拍照圣地'},
+                            {time: '15:30-17:00', activity: '《印象丽江》演出', location: '玉龙雪山剧场', food: '', cost: '演出票248元', tips: '张艺谋导演的大型实景演出'},
+                            {time: '18:00-19:30', activity: '返回古城晚餐', location: '丽江古城', food: '纳西烤鱼', cost: '约130元/人', tips: '选择三文鱼或金鳟鱼'},
+                            {time: '20:00', activity: '客栈休息', location: '古城客栈', food: '', cost: '', tips: '今日行程较累，早休息'}
+                        ]
+                    },
+                    {
+                        day: 5,
+                        title: '束河古镇 + 返程准备',
+                        schedule: [
+                            {time: '08:30-09:00', activity: '驾车前往束河古镇', location: '束河古镇（距古城8公里）', food: '', cost: '停车费20元', tips: '比大研古城更清静'},
+                            {time: '09:00-12:00', activity: '束河古镇漫步', location: '青龙桥、九鼎龙潭', food: '米灌肠、酥油茶', cost: '约50元/人', tips: '古镇清晨最美，拍照好时机'},
+                            {time: '12:30-14:00', activity: '束河特色午餐', location: '束河古镇', food: '黑山羊火锅', cost: '约120元/人', tips: '束河黑山羊很有名'},
+                            {time: '14:30-16:00', activity: '返回丽江古城，购买特产', location: '丽江古城', food: '', cost: '特产约300元', tips: '购买牦牛肉干、玛卡、雪茶等'},
+                            {time: '16:30-18:00', activity: '拉市海骑马（可选）', location: '拉市海', food: '', cost: '骑马约200元/人', tips: '时间充裕可去，否则可省略'},
+                            {time: '19:00-20:30', activity: '古城告别晚餐', location: '丽江古城', food: '纳西特色宴', cost: '约150元/人', tips: '最后一晚，品尝没吃过的美食'},
+                            {time: '21:00', activity: '收拾行李，准备返程', location: '古城客栈', food: '', cost: '', tips: '次日可开始返程或继续游玩泸沽湖'}
+                        ]
+                    }
+                ],
+                attractions: [
+                    {name: '丽江古城', intro: '世界文化遗产，纳西族历史文化名城，四方街、木府、狮子山是核心景点', time: '建议2-3小时', tickets: '古城维护费80元（部分景点需验票）', tips: '白天和夜晚各有特色，建议都体验'},
+                    {name: '玉龙雪山', intro: '纳西族神山，终年积雪，大索道可达海拔4680米冰川公园，蓝月谷美如仙境', time: '建议全天', tickets: '门票100元+大索道180元+环保车20元', tips: '提前备好氧气瓶、羽绒服，早上出发避开人流'},
+                    {name: '束河古镇', intro: '比大研古城更原始清静的纳西古镇，保留了更多传统风貌', time: '建议2-3小时', tickets: '免费（原50元门票已取消）', tips: '清晨游览最佳，避开旅行团'},
+                    {name: '木府', intro: '纳西族土司府邸，有"北有故宫，南有木府"之称，了解纳西文化必去', time: '建议1.5小时', tickets: '60元', tips: '请讲解员更有收获（50元）'},
+                    {name: '蓝月谷', intro: '玉龙雪山脚下，雪山融水形成的蓝绿色湖泊，被称为"小九寨"', time: '建议1.5小时', tickets: '含在玉龙雪山门票内', tips: '晴天水色最美，是拍照圣地'}
+                ],
+                food: [
+                    {name: '腊排骨火锅', location: '忠义市场', price: '约150元/人', recommend: '丽江必吃美食，排骨经腊制后炖煮', tips: '推荐钰洁腊排骨'},
+                    {name: '纳西烤鱼', location: '古城内各餐厅', price: '约130元/人', recommend: '金鳟鱼或三文鱼烤制，配豆豉', tips: '选择新鲜活鱼现烤'},
+                    {name: '鸡豆凉粉', location: '古城小摊', price: '约10元/份', recommend: '丽江特色小吃，凉粉或热炒', tips: '五一街附近的最地道'},
+                    {name: '黑山羊火锅', location: '束河古镇', price: '约120元/人', recommend: '束河特色，羊肉鲜嫩无膻味', tips: '带皮黑山羊最正宗'},
+                    {name: '丽江粑粑', location: '古城各处', price: '约15元/个', recommend: '酥油或豆沙馅，纳西传统糕点', tips: '现做现吃，趁热最好吃'}
+                ],
+                budget: {
+                    transport: {
+                        fuel: 2000,
+                        toll: 1100,
+                        parking: 100,
+                        total: 3200
+                    },
+                    accommodation: {
+                        hotel: '南宁商务酒店500元+昆明酒店450元+丽江客栈400元×2晚=1750元',
+                        nights: 4,
+                        total: 1750
+                    },
+                    food: {
+                        breakfast: 200,
+                        lunch: 600,
+                        dinner: 700,
+                        total: 1500
+                    },
+                    tickets: {
+                        attractions: 788,
+                        others: 200,
+                        total: 988
+                    },
+                    total: 7438
+                },
+                tips: [
+                    {title: '⏰ 最佳时间', content: '4-5月和9-10月最佳，避开雨季和严冬'},
+                    {title: '🚗 自驾建议', content: '路途遥远（1800公里），建议分3天驾驶，或飞昆明后租车前往'},
+                    {title: '⛰️ 高原反应', content: '丽江海拔2400米，玉龙雪山4680米，注意预防高反，备好氧气'},
+                    {title: '🧥 穿衣指南', content: '早晚温差大，需准备外套。登雪山需租羽绒服（50-80元）'},
+                    {title: '☀️ 防晒必备', content: '高原紫外线强，防晒霜50+、墨镜、帽子必备'},
+                    {title: '💰 消费水平', content: '古城内物价较高，可到新城采购。古城维护费80元'},
+                    {title: '🏠 住宿推荐', content: '建议住古城内特色客栈，体验纳西风情，但车辆不能进入'},
+                    {title: '🎫 门票优化', content: '玉龙雪山门票+索道建议网上提前预订，可省排队时间'},
+                    {title: '🎭 演出推荐', content: '《印象丽江》值得一看，建议下午场（阳光充足）'},
+                    {title: '🚨 特别提醒', content: '古城酒吧消费陷阱多，注意核对账单。不要轻信街边低价一日游'}
+                ],
+                bestTime: '春季4-5月（赏花）、秋季9-10月（秋高气爽）',
+                weather: '高原季风气候，干湿季分明，紫外线强，早晚温差大',
+                specialNotes: '丽江距离很远，建议飞昆明+租车，或安排7-10天自驾。古城内车辆禁行，需停在外围停车场'
+            },
+            '西双版纳': {
+                route: '广州 → 广昆高速 → 昆磨高速 → 西双版纳（约1700公里，建议分3天驾驶）',
+                scenery: '途经云南南部，从高原到热带雨林，傣族风情浓郁',
+                attractions: ['野象谷', '中科院热带植物园', '傣族园', '曼听公园', '勐腊望天树'],
+                food: ['傣味烧烤', '菠萝饭', '香茅草烤鱼', '酸笋煮鸡', '炸竹虫'],
+                budget: {
+                    fuel: 1900,
+                    toll: 1050,
+                    accommodation: 1500,
+                    food: 1600,
+                    tickets: 800,
+                    total: 6850
+                }
+            },
+            '香格里拉': {
+                route: '广州 → 广昆高速 → 大丽高速 → 香格里拉（约2000公里，建议分3-4天驾驶，高海拔需适应）',
+                scenery: '途经云南高原到藏区，雪山、草原、藏传佛教寺庙，景色震撼',
+                attractions: ['普达措国家公园', '松赞林寺', '独克宗古城', '虎跳峡', '梅里雪山'],
+                food: ['酥油茶', '青稞酒', '牦牛肉', '藏式火锅', '糌粑'],
+                budget: {
+                    fuel: 2200,
+                    toll: 1200,
+                    accommodation: 1800,
+                    food: 1700,
+                    tickets: 900,
+                    total: 7800
+                }
+            },
+            '海口': {
+                route: '广州 → 海口（轮渡过海，约400公里+轮渡3小时，总计8小时）',
+                scenery: '轮渡跨越琼州海峡，椰风海韵，热带风光',
+                attractions: ['骑楼老街', '火山口地质公园', '假日海滩', '五公祠', '万绿园'],
+                food: ['海南粉', '清补凉', '文昌鸡', '椰子饭', '老爸茶'],
+                budget: {
+                    fuel: 600,
+                    toll: 250,
+                    ferry: 800,
+                    accommodation: 1200,
+                    food: 1400,
+                    tickets: 500,
+                    total: 4750
+                }
+            },
+            '万宁': {
+                route: '广州 → 海口（轮渡）→ 东线高速 → 万宁（约450公里+轮渡，总计9小时）',
+                scenery: '海南东线海岸风光，冲浪胜地',
+                attractions: ['日月湾', '石梅湾', '兴隆热带植物园', '神州半岛', '东山岭'],
+                food: ['和乐蟹', '东山羊', '港北对虾', '后安粉', '椰子鸡'],
+                budget: {
+                    fuel: 650,
+                    toll: 280,
+                    ferry: 800,
+                    accommodation: 1300,
+                    food: 1500,
+                    tickets: 600,
+                    total: 5130
+                }
+            },
+            '陵水': {
+                route: '广州 → 海口（轮渡）→ 东线高速 → 陵水（约480公里+轮渡，总计9.5小时）',
+                scenery: '海南东南部海岸，清水湾、分界洲岛美景',
+                attractions: ['分界洲岛', '清水湾', '南湾猴岛', '吊罗山', '椰田古寨'],
+                food: ['陵水酸粉', '疍家海鲜', '椰子饭', '清补凉', '热带水果'],
+                budget: {
+                    fuel: 680,
+                    toll: 290,
+                    ferry: 800,
+                    accommodation: 1500,
+                    food: 1600,
+                    tickets: 800,
+                    total: 5670
+                }
+            },
+            '文昌': {
+                route: '广州 → 海口（轮渡）→ 东线高速 → 文昌（约420公里+轮渡，总计8.5小时）',
+                scenery: '海南东北部，椰林海岸，航天发射基地',
+                attractions: ['文昌航天发射中心', '铜鼓岭', '东郊椰林', '石头公园', '宋氏祖居'],
+                food: ['文昌鸡', '抱罗粉', '椰子船', '糟粕醋', '椰子饭'],
+                budget: {
+                    fuel: 630,
+                    toll: 270,
+                    ferry: 800,
+                    accommodation: 1100,
+                    food: 1400,
+                    tickets: 500,
+                    total: 4700
+                }
+            },
+            '柳州': {
+                route: '广州 → 广昆高速 → 柳州（约480公里，5.5小时）',
+                scenery: '途经梧州、柳江河谷，喀斯特地貌',
+                attractions: ['柳侯公园', '龙潭公园', '三江侗寨', '程阳风雨桥', '大龙潭'],
+                food: ['螺蛳粉', '酸肉', '牛腊巴', '滤粉', '云片糕'],
+                budget: {
+                    fuel: 580,
+                    toll: 310,
+                    accommodation: 700,
+                    food: 1100,
+                    tickets: 400,
+                    total: 3090
+                }
+            },
+            '贺州': {
+                route: '广州 → 广贺高速 → 贺州（约280公里，3.5小时）',
+                scenery: '途经广东、广西边界，喀斯特山区',
+                attractions: ['黄姚古镇', '姑婆山', '十八水', '玉石林', '紫云洞'],
+                food: ['黄姚豆腐酿', '牛肠酸', '信都三黄鸡', '客家盐鸡', '芋头扣肉'],
+                budget: {
+                    fuel: 350,
+                    toll: 180,
+                    accommodation: 600,
+                    food: 900,
+                    tickets: 500,
+                    total: 2530
+                }
+            }
+        };
+
+        let currentStep = 1;
+        let selectedProvince = '';
+        let selectedCity = '';
+        let isDrawing = false;
+
+        // 初始化：设置默认出发日期为今天
+        window.addEventListener('DOMContentLoaded', function() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('startDate').value = today;
+
+            // 更新副标题显示当前设置
+            updateSubtitle();
+
+            // 监听设置变化
+            document.getElementById('startCity').addEventListener('change', updateSubtitle);
+            document.getElementById('startDate').addEventListener('change', updateSubtitle);
+            document.getElementById('tripDays').addEventListener('change', updateSubtitle);
+        });
+
+        // 更新副标题
+        function updateSubtitle() {
+            const startCity = document.getElementById('startCity').value;
+            const tripDays = document.getElementById('tripDays').value;
+            const subtitle = document.querySelector('.subtitle');
+            subtitle.textContent = `${startCity}出发 · ${tripDays}天${parseInt(tripDays)-1}晚自驾游 · 说走就走的旅行`;
+        }
+
+        // 获取用户设置
+        function getUserSettings() {
+            return {
+                startCity: document.getElementById('startCity').value,
+                startDate: document.getElementById('startDate').value,
+                tripDays: parseInt(document.getElementById('tripDays').value)
+            };
+        }
+
+        // 格式化日期
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            const date = new Date(dateStr);
+            const year = date.getFullYear();
+            const month = date.getMonth() + 1;
+            const day = date.getDate();
+            const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+            const weekday = weekdays[date.getDay()];
+            return `${year}年${month}月${day}日（星期${weekday}）`;
+        }
+
+        function startDraw() {
+            if (isDrawing) return;
+
+            const btn = document.getElementById('drawBtn');
+            const display = document.getElementById('lotteryDisplay');
+
+            isDrawing = true;
+            btn.disabled = true;
+
+            if (currentStep === 1) {
+                // 抽取省份
+                drawProvince();
+            } else if (currentStep === 2) {
+                // 抽取城市
+                drawCity();
+            }
+        }
+
+        function drawProvince() {
+            const provinces = Object.keys(travelData);
+            const display = document.getElementById('lotteryDisplay');
+            const btn = document.getElementById('drawBtn');
+
+            display.classList.add('spinning');
+
+            let counter = 0;
+            const interval = setInterval(() => {
+                const randomProvince = provinces[Math.floor(Math.random() * provinces.length)];
+                display.textContent = randomProvince;
+                counter++;
+
+                if (counter > 20) {
+                    clearInterval(interval);
+                    display.classList.remove('spinning');
+                    selectedProvince = provinces[Math.floor(Math.random() * provinces.length)];
+                    display.textContent = selectedProvince;
+
+                    setTimeout(() => {
+                        document.getElementById('step1').classList.remove('active');
+                        document.getElementById('step1').classList.add('completed');
+                        document.getElementById('step2').classList.add('active');
+                        currentStep = 2;
+
+                        document.getElementById('lotteryTitle').textContent = '第二步：抽取城市';
+                        display.textContent = '点击下方按钮抽取城市';
+                        btn.disabled = false;
+                        isDrawing = false;
+                    }, 1000);
+                }
+            }, 100);
+        }
+
+        function drawCity() {
+            const cities = travelData[selectedProvince].cities;
+            const display = document.getElementById('lotteryDisplay');
+            const btn = document.getElementById('drawBtn');
+
+            display.classList.add('spinning');
+
+            let counter = 0;
+            const interval = setInterval(() => {
+                const randomCity = cities[Math.floor(Math.random() * cities.length)];
+                display.textContent = randomCity;
+                counter++;
+
+                if (counter > 20) {
+                    clearInterval(interval);
+                    display.classList.remove('spinning');
+                    selectedCity = cities[Math.floor(Math.random() * cities.length)];
+                    display.textContent = selectedCity;
+
+                    setTimeout(() => {
+                        document.getElementById('step2').classList.remove('active');
+                        document.getElementById('step2').classList.add('completed');
+                        document.getElementById('step3').classList.add('active');
+
+                        generateGuide();
+                    }, 1000);
+                }
+            }, 100);
+        }
+
+        function generateGuide() {
+            document.getElementById('lotterySection').style.display = 'none';
+            document.getElementById('resultSection').classList.add('show');
+
+            document.getElementById('finalDestination').textContent = `${selectedProvince} · ${selectedCity}`;
+
+            const guide = travelGuides[selectedCity];
+            const guideContent = document.getElementById('guideContent');
+            const settings = getUserSettings();
+
+            let html = '';
+
+            // 用户设置信息
+            html += `
+                <div class="guide-item" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;">
+                    <h3 style="color: white;">✨ 您的旅行计划</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px;">
+                        <div style="background: rgba(255,255,255,0.2); padding: 15px; border-radius: 8px;">
+                            <div style="font-size: 14px; opacity: 0.9; margin-bottom: 5px;">📍 出发城市</div>
+                            <div style="font-size: 18px; font-weight: bold;">${settings.startCity}</div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 15px; border-radius: 8px;">
+                            <div style="font-size: 14px; opacity: 0.9; margin-bottom: 5px;">📅 出发日期</div>
+                            <div style="font-size: 18px; font-weight: bold;">${formatDate(settings.startDate)}</div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 15px; border-radius: 8px;">
+                            <div style="font-size: 14px; opacity: 0.9; margin-bottom: 5px;">🕐 旅行天数</div>
+                            <div style="font-size: 18px; font-weight: bold;">${settings.tripDays}天${settings.tripDays-1}晚</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // 基本信息（修改路线起点）
+            const modifiedRoute = guide.route.replace(/^广州/, settings.startCity);
+            html += `
+                <div class="guide-item">
+                    <h3>🚗 自驾路线</h3>
+                    <p><strong>路线：</strong>${modifiedRoute}</p>
+                    <p><strong>沿途风景：</strong>${guide.scenery}</p>
+                </div>
+            `;
+
+            // 如果有详细行程，展示每日行程
+            if (guide.itinerary && guide.itinerary.length > 0) {
+                html += '<div class="guide-item"><h3>📅 5天4夜详细行程</h3></div>';
+
+                guide.itinerary.forEach(day => {
+                    html += `
+                        <div class="guide-item" style="border-left-color: #f093fb;">
+                            <h4 style="color: #f093fb; margin-bottom: 15px;">Day ${day.day}：${day.title}</h4>
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <thead>
+                                    <tr style="background: #f5f7fa;">
+                                        <th style="padding: 10px; text-align: left; border: 1px solid #ddd; width: 130px;">时间</th>
+                                        <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">活动安排</th>
+                                        <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">详细信息</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                    `;
+
+                    day.schedule.forEach(item => {
+                        let details = '';
+                        if (item.location) details += `📍 ${item.location}<br>`;
+                        if (item.food) details += `🍜 ${item.food}<br>`;
+                        if (item.transport) details += `🚗 ${item.transport}<br>`;
+                        if (item.tickets) details += `🎫 ${item.tickets}<br>`;
+                        if (item.cost) details += `💰 ${item.cost}<br>`;
+                        if (item.tips) details += `💡 ${item.tips}`;
+
+                        html += `
+                            <tr>
+                                <td style="padding: 10px; border: 1px solid #ddd; vertical-align: top; font-weight: bold; color: #667eea;">${item.time}</td>
+                                <td style="padding: 10px; border: 1px solid #ddd; vertical-align: top;">${item.activity}</td>
+                                <td style="padding: 10px; border: 1px solid #ddd; vertical-align: top; font-size: 0.9em; line-height: 1.6;">${details}</td>
+                            </tr>
+                        `;
+                    });
+
+                    html += `
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                });
+            }
+
+            // 景点详细介绍
+            if (guide.attractions) {
+                html += '<div class="guide-item"><h3>🎯 景点详细介绍</h3></div>';
+
+                if (Array.isArray(guide.attractions)) {
+                    if (typeof guide.attractions[0] === 'object') {
+                        // 详细景点信息
+                        guide.attractions.forEach((spot, index) => {
+                            html += `
+                                <div class="guide-item" style="background: #fff; border: 1px solid #e0e0e0; padding: 15px;">
+                                    <h4 style="color: #667eea; margin-bottom: 10px;">${index + 1}. ${spot.name}</h4>
+                                    <p><strong>简介：</strong>${spot.intro}</p>
+                                    <p><strong>游玩时间：</strong>${spot.time} | <strong>门票：</strong>${spot.tickets}</p>
+                                    <p style="color: #f5576c;"><strong>💡 Tips：</strong>${spot.tips}</p>
+                                </div>
+                            `;
+                        });
+                    } else {
+                        // 简单列表
+                        html += `
+                            <div class="guide-item">
+                                <ul>${guide.attractions.map(spot => `<li>${spot}</li>`).join('')}</ul>
+                            </div>
+                        `;
+                    }
+                }
+            }
+
+            // 美食详细推荐
+            if (guide.food) {
+                html += '<div class="guide-item"><h3>🍜 美食详细推荐</h3></div>';
+
+                if (Array.isArray(guide.food)) {
+                    if (typeof guide.food[0] === 'object') {
+                        // 详细美食信息
+                        guide.food.forEach((food, index) => {
+                            html += `
+                                <div class="guide-item" style="background: #fffaf0; border: 1px solid #ffe0b2; padding: 15px;">
+                                    <h4 style="color: #f5576c; margin-bottom: 10px;">${index + 1}. ${food.name}</h4>
+                                    <p><strong>📍 推荐店铺：</strong>${food.location}</p>
+                                    <p><strong>💰 人均消费：</strong>${food.price}</p>
+                                    ${food.recommend ? `<p><strong>🌟 必点菜品：</strong>${food.recommend}</p>` : ''}
+                                    ${food.tips ? `<p style="color: #666;"><strong>💡 Tips：</strong>${food.tips}</p>` : ''}
+                                </div>
+                            `;
+                        });
+                    } else {
+                        // 简单列表
+                        html += `
+                            <div class="guide-item">
+                                <ul>${guide.food.map(f => `<li>${f}</li>`).join('')}</ul>
+                            </div>
+                        `;
+                    }
+                }
+            }
+
+            // 预算详细明细
+            html += '<div class="guide-item"><h3>💰 费用预算明细（5天4晚，2人）</h3>';
+
+            if (guide.budget.transport) {
+                // 详细预算
+                html += `
+                    <p><strong>🚗 交通费用：</strong></p>
+                    <ul style="margin-left: 20px;">
+                        <li>油费：${guide.budget.transport.fuel} 元</li>
+                        <li>过路费：${guide.budget.transport.toll} 元</li>
+                        ${guide.budget.transport.parking ? `<li>停车费：${guide.budget.transport.parking} 元</li>` : ''}
+                        <li>小计：${guide.budget.transport.total} 元</li>
+                    </ul>
+
+                    <p><strong>🏨 住宿费用：</strong></p>
+                    <ul style="margin-left: 20px;">
+                        <li>标准：${guide.budget.accommodation.hotel}</li>
+                        <li>天数：${guide.budget.accommodation.nights} 晚</li>
+                        <li>小计：${guide.budget.accommodation.total} 元</li>
+                    </ul>
+
+                    <p><strong>🍽️ 餐饮费用：</strong></p>
+                    <ul style="margin-left: 20px;">
+                        <li>早餐：约 ${guide.budget.food.breakfast} 元/人/天</li>
+                        <li>午餐：约 ${guide.budget.food.lunch} 元/人/天</li>
+                        <li>晚餐：约 ${guide.budget.food.dinner} 元/人/天</li>
+                        <li>5天小计：${guide.budget.food.total} 元</li>
+                    </ul>
+
+                    <p><strong>🎫 门票费用：</strong></p>
+                    <ul style="margin-left: 20px;">
+                        <li>景点门票：${guide.budget.tickets.attractions} 元</li>
+                        ${guide.budget.tickets.others ? `<li>其他费用：${guide.budget.tickets.others} 元</li>` : ''}
+                        <li>小计：${guide.budget.tickets.total} 元</li>
+                    </ul>
+
+                    ${guide.budget.shopping ? `<p><strong>🛍️ 购物预算：</strong>约 ${guide.budget.shopping} 元</p>` : ''}
+                `;
+            } else {
+                // 简单预算
+                html += `
+                    <p><strong>油费：</strong>约 ${guide.budget.fuel} 元</p>
+                    <p><strong>过路费：</strong>约 ${guide.budget.toll} 元</p>
+                    ${guide.budget.ferry ? `<p><strong>轮渡费：</strong>约 ${guide.budget.ferry} 元</p>` : ''}
+                    <p><strong>住宿费：</strong>约 ${guide.budget.accommodation} 元（经济型酒店，250-300元/晚）</p>
+                    <p><strong>餐饮费：</strong>约 ${guide.budget.food} 元（含特色美食体验）</p>
+                    <p><strong>门票费：</strong>约 ${guide.budget.tickets} 元（主要景点）</p>
+                `;
+            }
+            html += '</div>';
+
+            // 预算总计
+            html += `
+                <div class="budget-box">
+                    <h3>预计总费用</h3>
+                    <div class="budget-amount">¥ ${guide.budget.total}</div>
+                    <p style="margin-top: 10px; font-size: 0.9em;">${guide.budget.notes || '*以上为参考预算，实际费用因个人消费习惯而异'}</p>
+                </div>
+            `;
+
+            // 实用建议
+            if (guide.tips && guide.tips.length > 0) {
+                html += '<div class="guide-item"><h3>📝 实用旅行建议</h3>';
+                guide.tips.forEach(tip => {
+                    html += `<p><strong>• ${tip.title}：</strong>${tip.content}</p>`;
+                });
+                html += '</div>';
+            } else {
+                html += `
+                    <div class="guide-item">
+                        <h3>📝 旅行建议</h3>
+                        <ul>
+                            <li>出发前检查车辆状况，准备好备用轮胎和应急工具</li>
+                            <li>提前规划住宿，旺季建议提前预订</li>
+                            <li>注意天气变化，携带适合的衣物</li>
+                            <li>下载离线地图，备好充电宝</li>
+                            <li>尊重当地风俗习惯，文明旅游</li>
+                            <li>购买旅游保险，确保出行安全</li>
+                        </ul>
+                    </div>
+                `;
+            }
+
+            // 其他信息
+            if (guide.bestTime || guide.weather || guide.specialNotes) {
+                html += '<div class="guide-item"><h3>ℹ️ 其他重要信息</h3>';
+                if (guide.bestTime) html += `<p><strong>🌞 最佳旅行时间：</strong>${guide.bestTime}</p>`;
+                if (guide.weather) html += `<p><strong>🌡️ 气候特点：</strong>${guide.weather}</p>`;
+                if (guide.specialNotes) html += `<p><strong>⚠️ 特别提示：</strong>${guide.specialNotes}</p>`;
+                html += '</div>';
+            }
+
+            // 在攻略内容前添加下载按钮
+            html = `
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <button class="btn" onclick="downloadGuide()" style="background: #4caf50; display: inline-flex; align-items: center; gap: 8px;">
+                        <span>📥</span>
+                        <span>下载攻略</span>
+                    </button>
+                </div>
+            ` + html;
+
+            guideContent.innerHTML = html;
+
+            document.getElementById('step3').classList.remove('active');
+            document.getElementById('step3').classList.add('completed');
+        }
+
+        // 下载攻略功能
+        function downloadGuide() {
+            const city = selectedCity;
+            const province = selectedProvince;
+            const guide = travelData[province][city];
+            const settings = getUserSettings();
+
+            // 构建文本内容
+            let content = `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+            content += `      ${city} ${settings.tripDays}天${settings.tripDays-1}晚自驾游详细攻略\n`;
+            content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+            content += `✨ 您的旅行计划\n`;
+            content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+            content += `📍 出发城市：${settings.startCity}\n`;
+            content += `📅 出发日期：${formatDate(settings.startDate)}\n`;
+            content += `🕐 旅行天数：${settings.tripDays}天${settings.tripDays-1}晚\n\n`;
+            content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+            content += `目的地信息\n`;
+            content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+            content += `📍 目的地：${province} - ${city}\n`;
+            const modifiedRoute = guide.route.replace(/^广州/, settings.startCity);
+            content += `🚗 自驾路线：${modifiedRoute}\n`;
+            content += `🌄 沿途风景：${guide.scenery}\n\n`;
+
+            // 详细行程
+            if (guide.itinerary) {
+                content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+                content += `📅 详细行程安排\n`;
+                content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+
+                guide.itinerary.forEach(day => {
+                    content += `【第 ${day.day} 天】${day.title}\n`;
+                    content += `${'─'.repeat(50)}\n`;
+                    day.schedule.forEach(item => {
+                        content += `⏰ ${item.time}\n`;
+                        content += `   活动：${item.activity}\n`;
+                        content += `   地点：${item.location}\n`;
+                        if (item.food) content += `   美食：${item.food}\n`;
+                        if (item.cost) content += `   费用：${item.cost}\n`;
+                        if (item.tips) content += `   💡 Tips：${item.tips}\n`;
+                        content += `\n`;
+                    });
+                    content += `\n`;
+                });
+            }
+
+            // 景点详细介绍
+            if (guide.attractions && guide.attractions[0] && typeof guide.attractions[0] === 'object') {
+                content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+                content += `🎯 景点详细介绍\n`;
+                content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+
+                guide.attractions.forEach((spot, index) => {
+                    content += `${index + 1}. ${spot.name}\n`;
+                    content += `   ${spot.intro}\n`;
+                    content += `   ⏱️  游玩时间：${spot.time}\n`;
+                    content += `   🎫 门票：${spot.tickets}\n`;
+                    content += `   💡 Tips：${spot.tips}\n\n`;
+                });
+            } else if (guide.attractions) {
+                content += `🎯 主要景点：${guide.attractions.join('、')}\n\n`;
+            }
+
+            // 美食推荐
+            if (guide.food && guide.food[0] && typeof guide.food[0] === 'object') {
+                content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+                content += `🍜 美食详细推荐\n`;
+                content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+
+                guide.food.forEach((food, index) => {
+                    content += `${index + 1}. ${food.name}\n`;
+                    content += `   📍 推荐店铺：${food.location}\n`;
+                    content += `   💰 人均消费：${food.price}\n`;
+                    if (food.recommend) content += `   🌟 必点菜品：${food.recommend}\n`;
+                    if (food.tips) content += `   💡 Tips：${food.tips}\n`;
+                    content += `\n`;
+                });
+            } else if (guide.food) {
+                content += `🍜 特色美食：${guide.food.join('、')}\n\n`;
+            }
+
+            // 预算明细
+            content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+            content += `💰 费用预算明细（5天4晚，2人）\n`;
+            content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+
+            if (guide.budget.transport) {
+                content += `🚗 交通费用：\n`;
+                content += `   • 油费：${guide.budget.transport.fuel} 元\n`;
+                content += `   • 过路费：${guide.budget.transport.toll} 元\n`;
+                if (guide.budget.transport.parking) content += `   • 停车费：${guide.budget.transport.parking} 元\n`;
+                content += `   • 小计：${guide.budget.transport.total} 元\n\n`;
+
+                content += `🏨 住宿费用：\n`;
+                content += `   • 标准：${guide.budget.accommodation.hotel}\n`;
+                content += `   • 天数：${guide.budget.accommodation.nights} 晚\n`;
+                content += `   • 小计：${guide.budget.accommodation.total} 元\n\n`;
+
+                content += `🍽️ 餐饮费用：\n`;
+                content += `   • 早餐：约 ${guide.budget.food.breakfast} 元\n`;
+                content += `   • 午餐：约 ${guide.budget.food.lunch} 元\n`;
+                content += `   • 晚餐：约 ${guide.budget.food.dinner} 元\n`;
+                content += `   • 5天小计：${guide.budget.food.total} 元\n\n`;
+
+                content += `🎫 门票费用：\n`;
+                content += `   • 景点门票：${guide.budget.tickets.attractions} 元\n`;
+                if (guide.budget.tickets.others) content += `   • 其他费用：${guide.budget.tickets.others} 元\n`;
+                content += `   • 小计：${guide.budget.tickets.total} 元\n\n`;
+            } else {
+                content += `🚗 交通费用：油费 ${guide.budget.fuel} 元 + 过路费 ${guide.budget.toll} 元\n`;
+                if (guide.budget.ferry) content += `🚢 轮渡费：${guide.budget.ferry} 元\n`;
+                content += `🏨 住宿费：${guide.budget.accommodation} 元\n`;
+                content += `🍽️ 餐饮费：${guide.budget.food} 元\n`;
+                content += `🎫 门票费：${guide.budget.tickets} 元\n\n`;
+            }
+
+            content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+            content += `💵 预计总费用：¥ ${guide.budget.total}\n`;
+            content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+            content += `* 以上为参考预算，实际费用因个人消费习惯而异\n\n`;
+
+            // 实用建议
+            if (guide.tips && guide.tips.length > 0) {
+                content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+                content += `📝 实用旅行建议\n`;
+                content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+
+                guide.tips.forEach(tip => {
+                    content += `• ${tip.title}\n`;
+                    content += `  ${tip.content}\n\n`;
+                });
+            }
+
+            // 其他重要信息
+            if (guide.bestTime || guide.weather || guide.specialNotes) {
+                content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+                content += `ℹ️  其他重要信息\n`;
+                content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+
+                if (guide.bestTime) content += `🌞 最佳旅行时间：${guide.bestTime}\n\n`;
+                if (guide.weather) content += `🌡️  气候特点：${guide.weather}\n\n`;
+                if (guide.specialNotes) content += `⚠️  特别提示：${guide.specialNotes}\n\n`;
+            }
+
+            content += `\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+            content += `   祝您旅途愉快！🎉\n`;
+            content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+
+            // 创建下载
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            const fileName = `${settings.startCity}到${city}_${settings.tripDays}天${settings.tripDays-1}晚自驾游攻略.txt`;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            // 提示用户
+            alert(`攻略已下载！\n文件名：${fileName}`);
+        }
+
+        // 搜索城市功能
+        function searchCity() {
+            const searchInput = document.getElementById('searchInput');
+            const searchHint = document.getElementById('searchHint');
+            const cityName = searchInput.value.trim();
+
+            if (!cityName) {
+                searchHint.innerHTML = '<span style="color: #f5576c;">请输入城市名</span>';
+                return;
+            }
+
+            // 在所有省份中查找城市
+            let foundProvince = null;
+            let foundCity = null;
+
+            for (const [province, cities] of Object.entries(travelData)) {
+                if (cities[cityName]) {
+                    foundProvince = province;
+                    foundCity = cityName;
+                    break;
+                }
+            }
+
+            if (foundCity) {
+                // 找到城市，显示攻略
+                selectedProvince = foundProvince;
+                selectedCity = foundCity;
+
+                // 调用抽签后的攻略生成函数
+                generateGuide();
+
+                // 清空搜索框
+                searchInput.value = '';
+                searchHint.innerHTML = '';
+            } else {
+                // 未找到城市，显示提示
+                searchHint.innerHTML = `<span style="color: #f5576c;">❌ 未找到"${cityName}"，请检查城市名是否正确</span>`;
+
+                // 显示可用城市列表
+                const allCities = [];
+                for (const [province, cities] of Object.entries(travelData)) {
+                    for (const city of Object.keys(cities)) {
+                        allCities.push(city);
+                    }
+                }
+
+                // 显示部分推荐城市
+                const recommendCities = allCities.slice(0, 10).join('、');
+                setTimeout(() => {
+                    searchHint.innerHTML += `<br><span style="color: #666;">💡 推荐城市：${recommendCities}...</span>`;
+                }, 500);
+            }
+        }
+
+        function restart() {
+            location.reload();
+        }
+    </script>
+</body>
+</html>
