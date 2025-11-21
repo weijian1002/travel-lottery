@@ -247,7 +247,7 @@
 <body>
     <div class="container">
         <h1>🎲 旅游地点抽签</h1>
-        <p class="subtitle">智能旅游攻略助手 · 自驾/公共交通 · 说走就走的旅行</p>
+        <p class="subtitle">旅游攻略助手 · 自驾/公共交通 · 定制属于你说走就走的旅行</p>
 
         <div class="lottery-section" id="lotterySection">
             <!-- 旅行设置面板 -->
@@ -257,7 +257,7 @@
                     <div>
                         <label style="display: block; margin-bottom: 5px; font-weight: bold;">📍 出发城市</label>
                         <input list="cityList" id="startCity" placeholder="输入或选择城市" onchange="updateSubtitle()"
-                            style="width: 100%; padding: 10px; font-size: 14px; border: none; border-radius: 5px; outline: none;" value="广州">
+                            style="width: 100%; padding: 10px; font-size: 14px; border: none; border-radius: 5px; outline: none;">
                         <datalist id="cityList">
                             <option value="广州">
                             <option value="深圳">
@@ -271,7 +271,7 @@
                     <div>
                         <label style="display: block; margin-bottom: 5px; font-weight: bold;">🕐 旅行天数</label>
                         <input list="daysList" id="tripDays" placeholder="输入或选择天数" type="number" min="1" max="30" onchange="updateSubtitle()"
-                            style="width: 100%; padding: 10px; font-size: 14px; border: none; border-radius: 5px; outline: none;" value="5">
+                            style="width: 100%; padding: 10px; font-size: 14px; border: none; border-radius: 5px; outline: none;">
                         <datalist id="daysList">
                             <option value="3">
                             <option value="5">
@@ -2488,6 +2488,13 @@
         function updateSubtitle() {
             const settings = getUserSettings();
             const subtitle = document.querySelector('.subtitle');
+
+            // 如果没有输入城市或天数，显示默认文案
+            if (!settings.startCity || !settings.tripDays) {
+                subtitle.textContent = '定制属于你说走就走的旅行';
+                return;
+            }
+
             const travelModeText = settings.travelMode === 'self-driving' ? '自驾游' : '公共交通';
             subtitle.textContent = `${settings.startCity}出发 · ${settings.tripDays}天${settings.tripDays-1}晚${travelModeText} · 说走就走的旅行`;
         }
@@ -2509,10 +2516,11 @@
 
         function getUserSettings() {
             const tripDays = document.getElementById('tripDays').value;
+            const startCity = document.getElementById('startCity').value.trim();
             return {
-                startCity: document.getElementById('startCity').value.trim() || '广州',
+                startCity: startCity || '广州', // 如果为空，后端使用默认值
                 startDate: document.getElementById('startDate').value,
-                tripDays: parseInt(tripDays) || 5,
+                tripDays: parseInt(tripDays) || 5, // 如果为空，后端使用默认值
                 travelMode: document.getElementById('travelMode').value,
                 transportType: document.getElementById('transportType').value
             };
