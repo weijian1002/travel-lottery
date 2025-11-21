@@ -2882,12 +2882,6 @@
             }
 
             if (foundCity) {
-                // 检查是否有该城市的攻略数据
-                if (!travelGuides[foundCity]) {
-                    searchHint.innerHTML = `<span style="color: #f5576c;">❌ "${foundCity}"暂无详细攻略</span>`;
-                    return;
-                }
-
                 // 找到城市，显示攻略
                 selectedProvince = foundProvince;
                 selectedCity = foundCity;
